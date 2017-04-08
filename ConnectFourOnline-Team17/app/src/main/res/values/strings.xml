@@ -10,6 +10,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login_btn">Login</string>
+    <string name="rememberLogIn">Keep me signed in</string>
     <string name="start_game_button">Start Game</string>
     <string name="name_of_loser">INSERT LOSER</string>
     <string name="name_of_winner">INSERT WINNER</string>
