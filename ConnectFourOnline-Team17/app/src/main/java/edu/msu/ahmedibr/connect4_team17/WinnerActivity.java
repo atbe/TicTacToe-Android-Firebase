@@ -59,7 +59,7 @@ public class WinnerActivity extends AppCompatActivity {
     public void onNewGame(View view) {
         // Start a new game
         // TODO: Make sure we reinitialize the game state
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
