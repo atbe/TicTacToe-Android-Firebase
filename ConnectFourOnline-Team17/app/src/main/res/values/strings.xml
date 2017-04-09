@@ -33,10 +33,13 @@
     <string name="password_not_complex_enough">Password too short! Must be at least 6 characters.</string>
     <string name="unhandled_error">Unhandled error! Please report to developer.</string>
     <string name="account_created">Account created!</string>
+    <string name="login_succeeded">Login succeeded!</string>
+    <string name="email_address_invalid">Email address cannot be used to sign up. Is there another account with this email?</string>
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
     <string name="start_game_button">Start Game</string>
+    <string name="sign_out_menu_button">Sign Out</string>
 
     <!--Checkboxes-->
     <string name="rememberLogIn">Keep me signed in</string>

@@ -14,6 +14,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -145,26 +146,25 @@ public class CreateAccountActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(AUTH_STATUS_TAG, "createUserWithEmail:onComplete:" + task.getResult());
-
                         if (!task.isSuccessful()) {
-                        try {
-                            throw task.getException();
-                        } catch (FirebaseAuthWeakPasswordException e) {
-                            makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
-                            return;
-                        } catch (FirebaseAuthInvalidUserException e) {
-                            makeSnack(R.string.login_failed_snackbar, Snackbar.LENGTH_LONG);
-                            makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
-                            return;
-                        } catch (Exception e) {
-                            makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
-                            return;
+                            try {
+                                throw task.getException();
+                            } catch (FirebaseAuthWeakPasswordException e) {
+                                makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
+                                return;
+                            } catch (FirebaseAuthUserCollisionException e) {
+                                makeSnack(R.string.email_address_invalid, Snackbar.LENGTH_LONG);
+                                return;
+                            } catch (Exception e) {
+                                makeSnack(R.string.unhandled_error, Snackbar.LENGTH_LONG);
+                                return;
+                            }
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
                         }
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        }
+
+                        Log.d(AUTH_STATUS_TAG, "createUserWithEmail:onComplete:" + task.getResult());
 
                         makeSnack(R.string.account_created, Snackbar.LENGTH_LONG);
                     }
