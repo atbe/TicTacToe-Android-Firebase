@@ -5,16 +5,19 @@
     <string name="new_game">New Game</string>
     <string name="instructions">Instructions</string>
     <string name="loser_text">Sorry, you lost.</string>
+    <string name="tied">Tie Game!</string>
 
     <!--Hints-->
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
+    <string name="password_verify_hint">Verify Password</string>
 
     <!--Titles-->
     <string name="app_name">Connect 4 - Team 17</string>
     <string name="main_lets_play_title">Let\'s Play Connect 4!</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="create_account_title">Create Account</string>
 
     <!--Alerts-->
     <string name="winner_text">You Won!</string>
@@ -22,6 +25,14 @@
     <string name="already_made_move">You already placed a disk!</string>
     <string name="no_move_played">You must make a move before ending your turn!</string>
     <string name="column_full">That column is full! You cannot place a disk there.</string>
+    <string name="username_cannot_be_empty">Username field cannot be empty</string>
+    <string name="password_cannot_be_empty">Password field cannot be empty</string>
+    <string name="login_failed_snackbar">Login failed. Check your username and password.</string>
+    <string name="verify_password_cannot_be_empty">Verify Password field cannot be empty</string>
+    <string name="password_and_verify_must_match">Password and Verify Password do not match.</string>
+    <string name="password_not_complex_enough">Password too short! Must be at least 6 characters.</string>
+    <string name="unhandled_error">Unhandled error! Please report to developer.</string>
+    <string name="account_created">Account created!</string>
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
@@ -35,11 +46,13 @@
 
     <!--Segments-->
     <string name="dialog_message">Two players alternate turns dropping one of their discs at a time into an unfilled column until a player achieves four discs in a row diagonally, horizontally, or vertically and wins.\nIf the game board fills before either player achieves four in a row, then the game is a draw.\nYou may only place 1 tile per turn, and then you must hit the \"Done\" button. \nIf you have connected 4 in a row, after hitting \"Done\" it will take you to the winner screen.\nYou can \"Give Up\" through the \"Surrender\" button at any time.\nPlayer 1 is the dark green Sparty tile and Player 2 is the white Sparty tile.
+    </string>
 
     <!--samples-->
     <string name="name_of_loser">INSERT LOSER</string>
     <string name="name_of_winner">INSERT WINNER</string>
     <string name="sampletext">SAMPLE TEXT</string>
+    <string name="create_account">Create Account</string>
+    <string name="title_activity_create_account">CreateAccountActivity</string>
 
-</string>
 </resources>
