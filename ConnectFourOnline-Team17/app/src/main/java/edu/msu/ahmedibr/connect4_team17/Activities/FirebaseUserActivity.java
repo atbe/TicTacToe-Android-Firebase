@@ -32,7 +32,7 @@ public class FirebaseUserActivity extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
-    }t 
+    }
 
     @Override
     protected void onStart() {
