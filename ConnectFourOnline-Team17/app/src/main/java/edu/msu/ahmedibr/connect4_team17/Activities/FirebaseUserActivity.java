@@ -5,10 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-/**
- * Created by abe on 4/9/17.
- */
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAMES_DATABASE_ROOT_KEY;
 
 public class FirebaseUserActivity extends AppCompatActivity {
     /// authentication agent
@@ -17,12 +17,26 @@ public class FirebaseUserActivity extends AppCompatActivity {
     // Listener for sign-in status changes
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    /**
+     * Reference to the root of the database.
+     */
+    protected DatabaseReference mDatabaseRootRef;
+
+    /**
+     * Firebase database references
+     */
+    protected DatabaseReference mGamesDatabaseRef;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // firebase authentication init
         mAuth = FirebaseAuth.getInstance();
+
+        // initialze the root ref
+        mDatabaseRootRef = FirebaseDatabase.getInstance().getReference();
+        mGamesDatabaseRef = mDatabaseRootRef.child(GAMES_DATABASE_ROOT_KEY).getRef();
     }
 
     @Override
@@ -45,5 +59,9 @@ public class FirebaseUserActivity extends AppCompatActivity {
 
     public void setAuthStateListener(FirebaseAuth.AuthStateListener listner) {
         mAuthListener = listner;
+    }
+
+    public boolean isUserInGame() {
+        return true;
     }
 }

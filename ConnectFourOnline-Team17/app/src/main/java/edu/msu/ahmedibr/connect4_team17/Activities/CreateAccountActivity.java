@@ -70,10 +70,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_account);
 
         initViews();
-        FirebaseApp.initializeApp(this);
-
-        // firebase authentication init
-        mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override

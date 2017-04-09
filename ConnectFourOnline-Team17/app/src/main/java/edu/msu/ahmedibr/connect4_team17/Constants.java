@@ -9,10 +9,18 @@ public class Constants {
     /**
      * Database key constants
      */
-    public static final String CREATE_ID_KEY = "creatorId";
-    public static final String GAME_POOL_STATE_KEY = "state";
+    // root nodes (tables)
     public static final String GAMES_DATABASE_ROOT_KEY = "games";
 
+    public static final String CREATOR_DATA_KEY = "creator";
+    public static final String JOINER_DATA_KEY = "joiner";
+
+    // user attribute keys
+    public static final String USER_ID_KEY = "id";
+    public static final String USER_DISPLAYNAME_KEY = "displayName";
+
+    // game attribute keys
+    public static final String GAME_POOL_STATE_KEY = "state";
 
     public static final String FAKE_EMAIL_DOMAIN_URL = "@tictactoefor476appyo.com";
 }
