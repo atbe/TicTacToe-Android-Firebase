@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
+
 /**
  * TODO: document your custom view class.
  */

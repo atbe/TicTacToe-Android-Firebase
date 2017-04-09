@@ -6,7 +6,7 @@
     android:id="@+id/game_waitroom_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.msu.ahmedibr.connect4_team17.GameRoomActivity">
+    tools:context="edu.msu.ahmedibr.connect4_team17.Activities.GameRoomActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.Activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,7 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import static edu.msu.ahmedibr.connect4_team17.LoginActivity.LOGIN_STATUS_HANGED_TAG;
+import edu.msu.ahmedibr.connect4_team17.R;
+
+import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 
 public class GameRoomActivity extends FirebaseUserActivity {
 

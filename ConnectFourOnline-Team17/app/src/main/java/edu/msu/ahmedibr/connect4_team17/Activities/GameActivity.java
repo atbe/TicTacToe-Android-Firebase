@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.Activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import edu.msu.ahmedibr.connect4_team17.ConnectFourGame;
+import edu.msu.ahmedibr.connect4_team17.ConnectFourView;
+import edu.msu.ahmedibr.connect4_team17.R;
 
 public class GameActivity extends AppCompatActivity {
     public static final String PLAYER_ONE_NAME_BUNDLE_KEY = "com.cse476.team17.player_one_name_bundle";

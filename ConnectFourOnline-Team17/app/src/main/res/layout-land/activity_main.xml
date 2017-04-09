@@ -15,7 +15,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        tools:context="edu.msu.ahmedibr.connect4_team17.LoginActivity">
+        tools:context="edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity">
 
         <TextView android:id="@+id/main_lets_play_title"
             android:text="@string/main_lets_play_title"

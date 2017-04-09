@@ -10,6 +10,8 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
+
 public class ConnectFourGame {
     /**
      * Used to identify player one.

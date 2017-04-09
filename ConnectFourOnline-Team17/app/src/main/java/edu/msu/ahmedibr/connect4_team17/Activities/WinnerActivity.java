@@ -1,10 +1,12 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.Activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import edu.msu.ahmedibr.connect4_team17.R;
 
 public class WinnerActivity extends AppCompatActivity {
     public static final String WINNING_PLAYER_NAME_BUNDLE_KEY = "com.cse476.team17.winning_player_name";

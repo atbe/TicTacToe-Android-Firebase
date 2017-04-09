@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 
+import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
+
 /**
  * This class represents one piece of our puzzle.
  */
