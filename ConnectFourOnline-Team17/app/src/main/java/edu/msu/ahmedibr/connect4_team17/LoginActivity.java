@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -146,11 +147,11 @@ public class LoginActivity extends FirebaseUserActivity {
                             Log.w(AUTH_FAILED_TAG, "signInWithEmail:failed", task.getException());
                             try {
                                 throw task.getException();
-                            } catch (FirebaseAuthInvalidUserException e) {
+                            } catch (FirebaseAuthInvalidCredentialsException e) {
                                 makeSnack(R.string.login_failed_snackbar, Snackbar.LENGTH_LONG);
                                 return;
                             } catch (Exception e) {
-                                makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
+                                makeSnack(R.string.unhandled_error, Snackbar.LENGTH_LONG);
                                 return;
                             }
                             // If sign in fails, display a message to the user. If sign in succeeds
