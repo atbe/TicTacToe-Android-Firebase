@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import edu.msu.ahmedibr.connect4_team17.ConnectFourGame;
-import edu.msu.ahmedibr.connect4_team17.ConnectFourView;
+import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourGame;
+import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourView;
 import edu.msu.ahmedibr.connect4_team17.R;
 
 public class GameActivity extends AppCompatActivity {

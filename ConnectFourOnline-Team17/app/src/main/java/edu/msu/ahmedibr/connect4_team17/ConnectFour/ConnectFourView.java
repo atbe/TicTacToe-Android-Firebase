@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 import android.app.Activity;
 import android.content.Context;

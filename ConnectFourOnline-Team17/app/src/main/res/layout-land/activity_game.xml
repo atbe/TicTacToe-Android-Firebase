@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
-            <edu.msu.ahmedibr.connect4_team17.ConnectFourView
+            <edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourView
                 android:id="@+id/connectFourView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
