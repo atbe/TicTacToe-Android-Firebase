@@ -1,30 +1,45 @@
 <resources>
-    <string name="app_name">Connect 4 - Team 17</string>
-    <string name="winner_text">You Won!</string>
-    <string name="new_game">New Game</string>
-    <string name="main_lets_play_title">Let\'s Play Connect 4!</string>
+    <!--Prompts-->
     <string name="player_one_name_prompt">Player 1 Name</string>
     <string name="player_two_name_prompt">Player 2 Name</string>
+    <string name="new_game">New Game</string>
+    <string name="instructions">Instructions</string>
+    <string name="loser_text">Sorry, you lost.</string>
+
+    <!--Hints-->
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
+
+    <!--Titles-->
+    <string name="app_name">Connect 4 - Team 17</string>
+    <string name="main_lets_play_title">Let\'s Play Connect 4!</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+
+    <!--Alerts-->
+    <string name="winner_text">You Won!</string>
+    <string name="names_empty">Player names cannot be empty!</string>
+    <string name="already_made_move">You already placed a disk!</string>
+    <string name="no_move_played">You must make a move before ending your turn!</string>
+    <string name="column_full">That column is full! You cannot place a disk there.</string>
+
+    <!--Buttons-->
     <string name="login_btn">Login</string>
-    <string name="rememberLogIn">Keep me signed in</string>
     <string name="start_game_button">Start Game</string>
-    <string name="name_of_loser">INSERT LOSER</string>
-    <string name="name_of_winner">INSERT WINNER</string>
-    <string name="loser_text">Sorry, you lost.</string>
+
+    <!--Checkboxes-->
+    <string name="rememberLogIn">Keep me signed in</string>
     <string name="done_btn">Done</string>
     <string name="surrender_btn">Surrender</string>
     <string name="undo_btn">Undo</string>
-    <string name="names_empty">Player names cannot be empty!</string>
-    <string name="no_move_played">You must make a move before ending your turn!</string>
-    <string name="column_full">That column is full! You cannot place a disk there.</string>
-    <string name="already_made_move">You already placed a disk!</string>
-    <string name="tied">Tie Game!</string>
-    <string name="instructions">Instructions</string>
-    <string name="sampletext">SAMPLE TEXT</string>
+
+    <!--Segments-->
     <string name="dialog_message">Two players alternate turns dropping one of their discs at a time into an unfilled column until a player achieves four discs in a row diagonally, horizontally, or vertically and wins.\nIf the game board fills before either player achieves four in a row, then the game is a draw.\nYou may only place 1 tile per turn, and then you must hit the \"Done\" button. \nIf you have connected 4 in a row, after hitting \"Done\" it will take you to the winner screen.\nYou can \"Give Up\" through the \"Surrender\" button at any time.\nPlayer 1 is the dark green Sparty tile and Player 2 is the white Sparty tile.
+
+    <!--samples-->
+    <string name="name_of_loser">INSERT LOSER</string>
+    <string name="name_of_winner">INSERT WINNER</string>
+    <string name="sampletext">SAMPLE TEXT</string>
+
 </string>
 </resources>
