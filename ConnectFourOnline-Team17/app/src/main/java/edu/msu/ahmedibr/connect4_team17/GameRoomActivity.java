@@ -2,6 +2,7 @@ package edu.msu.ahmedibr.connect4_team17;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +15,11 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import static edu.msu.ahmedibr.connect4_team17.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 
@@ -33,9 +37,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
     /**
      * List of all the open games the current player can join
      */
-    private ListView mGameList;
+    private ListView mOpenGameList;
 
-    private FirebaseListAdapter mGameAdapter;
+    private FirebaseListAdapter mOpenGamesAdapter;
 
 
     @Override
@@ -62,7 +66,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
 //                    mUsernameTextView.setText(mAuth.getCurrentUser().getEmail().concat("\n"));
 //                    mWhenCreatedAccountTextView.setText(mAuth.getCurrentUser().getUid());
 
-                } else {
+               } else {
                     // User is signed out
                     Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
                     // TODO: Add actions to remove user data from preferences close game, and return
@@ -73,26 +77,30 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
         initViews();
 
-        mGameAdapter = new FirebaseListAdapter<Game>(this, Game.class, android.R.layout.two_line_list_item, mGamesRef) {
+        mOpenGamesAdapter = new FirebaseListAdapter<Game>(this, Game.class, android.R.layout.two_line_list_item, mGamesRef.orderByChild("state").equalTo(0)) {
             @Override
             protected void populateView(View view, Game game, int position) {
-                Log.d("PopulatingGameList", String.format("Incoming game from creator '%s'", game.getCreator()));
-                ((TextView)view.findViewById(android.R.id.text1)).setText(game.getCreator());
+                Log.d("PopulatingGameList", String.format("Incoming game from creator '%s' with state '%d'", game.getCreator(), game.getState()));
+                if (game.getCreatorId().equals(mAuth.getCurrentUser().getUid())) {
+                    ((TextView)view.findViewById(android.R.id.text1)).setText("(ME) ".concat(game.getCreator()));
+                } else {
+                    ((TextView)view.findViewById(android.R.id.text1)).setText(game.getCreator());
+                }
             }
         };
-        mGameList.setAdapter(mGameAdapter);
+        mOpenGameList.setAdapter(mOpenGamesAdapter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mGameAdapter.cleanup();
+        mOpenGamesAdapter.cleanup();
     }
 
     private void initViews() {
 //        mUsernameTextView = (TextView) findViewById(R.id.);
 //        mWhenCreatedAccountTextView = (TextView) findViewById(R.id.created_account_time_textview);
-        mGameList = (ListView) findViewById(R.id.gameList);
+        mOpenGameList = (ListView) findViewById(R.id.gameList);
     }
 
     @Override
@@ -114,14 +122,67 @@ public class GameRoomActivity extends FirebaseUserActivity {
         }
     }
 
+    private void makeSnack(int stringId, int length) {
+        Snackbar.make(
+                findViewById(R.id.game_waitroom_activity_coordinator_layout),
+                getResources().getText(stringId),
+                length).show();
+    }
+
     public void onCreateGame(View view) {
+        final String username = mAuth.getCurrentUser().getDisplayName();
+        final String uid = mAuth.getCurrentUser().getUid();
+        final Game game = new Game(username, mAuth.getCurrentUser().getUid());
+        Log.d("CreateGame", String.format("Creating game for user '%s'", username));
+
+        // check if there is already a game this user created
+        mGamesRef.orderByChild("creatorId").equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
+                } else {
+                    mGamesRef.push().setValue(game);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     }
 
     public static class Game {
-        private String mCreator;
+        public enum State { OPEN, JOINED, STARTED }
 
+        private String mCreator;
+        private String mCreatorId;
+        private int mState = State.OPEN.ordinal();
+
+        // no-arg ctor needed for firebase
         public Game() {
-            // needed for firebase
+            mState = State.OPEN.ordinal();
+        }
+
+        public Game(String creator, String creatorId) {
+            mCreator = creator;
+            mCreatorId = creatorId;
+            mState = State.OPEN.ordinal();
+        }
+
+        public String getCreatorId() {
+            return mCreatorId;
+        }
+
+        public void setCreatorId(String creatorId) {
+            this.mCreatorId = creatorId;
+        }
+
+        public int getState() {
+            return mState;
+        }
+
+        public void setState(int state) {
+            this.mState = state;
         }
 
         public String getCreator() {
@@ -130,10 +191,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
         public void setCreator(String creator) {
             this.mCreator = creator;
-        }
-
-        public Game(String creator) {
-            mCreator = creator;
         }
     }
 }
