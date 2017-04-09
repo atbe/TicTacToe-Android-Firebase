@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +25,9 @@ import com.google.firebase.database.ValueEventListener;
 import edu.msu.ahmedibr.connect4_team17.R;
 
 import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
+import static edu.msu.ahmedibr.connect4_team17.Constants.CREATE_ID_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAMES_DATABASE_ROOT_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 
 public class GameRoomActivity extends FirebaseUserActivity {
 
@@ -56,7 +60,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
         FirebaseApp.initializeApp(this);
         mRootRef = FirebaseDatabase.getInstance().getReference();
-        mGamesRef = mRootRef.child("games").getRef();
+        mGamesRef = mRootRef.child(GAMES_DATABASE_ROOT_KEY).getRef();
 
         setAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
@@ -79,7 +83,8 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
         initViews();
 
-        mOpenGamesAdapter = new FirebaseListAdapter<Game>(this, Game.class, android.R.layout.two_line_list_item, mGamesRef.orderByChild("state").equalTo(0)) {
+        mOpenGamesAdapter = new FirebaseListAdapter<Game>(this, Game.class,
+                android.R.layout.two_line_list_item, mGamesRef.orderByChild(GAME_POOL_STATE_KEY).equalTo(0)) {
             @Override
             protected void populateView(View view, Game game, int position) {
                 Log.d("PopulatingGameList", String.format("Incoming game from creator '%s' with state '%d'", game.getCreator(), game.getState()));
@@ -89,8 +94,17 @@ public class GameRoomActivity extends FirebaseUserActivity {
                     ((TextView)view.findViewById(android.R.id.text1)).setText(game.getCreator());
                 }
             }
+
+
         };
         mOpenGameList.setAdapter(mOpenGamesAdapter);
+        mOpenGameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Game game = (Game) adapterView.getItemAtPosition(position);
+                makeSnack(String.format("You pressed game from creator '%s'", game.getCreator()), Snackbar.LENGTH_LONG);
+            }
+        });
     }
 
     @Override
@@ -131,6 +145,14 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 length).show();
     }
 
+    private void makeSnack(String string, int length) {
+        Snackbar.make(
+                findViewById(R.id.game_waitroom_activity_coordinator_layout),
+                string,
+                length).show();
+    }
+
+
     public void onCreateGame(View view) {
         final String username = mAuth.getCurrentUser().getDisplayName();
         final String uid = mAuth.getCurrentUser().getUid();
@@ -138,7 +160,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
         Log.d("CreateGame", String.format("Creating game for user '%s'", username));
 
         // check if there is already a game this user created
-        mGamesRef.orderByChild("creatorId").equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        mGamesRef.orderByChild(CREATE_ID_KEY).equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {

@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import edu.msu.ahmedibr.connect4_team17.R;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.FAKE_EMAIL_DOMAIN_URL;
+
 public class LoginActivity extends FirebaseUserActivity {
 
     /**
@@ -41,9 +43,6 @@ public class LoginActivity extends FirebaseUserActivity {
     public static final String LOGIN_STATUS_HANGED_TAG = "LOGIN_STATUS_CHANGED";
     public static final String AUTH_FAILED_TAG = "AUTH_FAILED";
     public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
-
-    private final String FAKE_EMAIL_DOMAIN_URL = "@tictactoefor476appyo.com";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
