@@ -39,27 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles the Start Game button click
-     * @param view: the main activity view
+     * Click handler for the login button.
+     *
+     * @param view
      */
-    public void onStartGame(View view) {
-        String playerOneName = ((TextView)findViewById(R.id.playerOneInput)).getText().toString();
-        String playerTwoName = ((TextView)findViewById(R.id.playerTwoInput)).getText().toString();
+    public void onLogin(View view) {
 
-        if (playerOneName.isEmpty() || playerTwoName.isEmpty()) {
-            Snackbar.make(findViewById(R.id.main_coordinator_layout),
-                    R.string.names_empty, Snackbar.LENGTH_LONG).show();
-        } else {
-            // Start the game
-            Intent intent = new Intent(this, GameActivity.class);
-
-            intent.putExtra(GameActivity.PLAYER_ONE_NAME_BUNDLE_KEY, playerOneName);
-            intent.putExtra(GameActivity.PLAYER_TWO_NAME_BUNDLE_KEY, playerTwoName);
-
-            startActivity(intent);
-
-            // done with the opening activity
-            finish();
-        }
     }
 }
