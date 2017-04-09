@@ -6,11 +6,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static edu.msu.ahmedibr.connect4_team17.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 
@@ -19,12 +24,33 @@ public class GameRoomActivity extends FirebaseUserActivity {
     private TextView mUsernameTextView;
     private TextView mWhenCreatedAccountTextView;
 
+    /**
+     * Firebase database references
+     */
+    private DatabaseReference mRootRef;
+    private DatabaseReference mGamesRef;
+
+    /**
+     * List of all the open games the current player can join
+     */
+    private ListView mGameList;
+
+    private FirebaseListAdapter mGameAdapter;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_room);
 
         FirebaseApp.initializeApp(this);
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mGamesRef = mRootRef.child("games").getRef();
 
         setAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
@@ -33,8 +59,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    mUsernameTextView.setText(mAuth.getCurrentUser().getEmail().concat("\n"));
-                    mWhenCreatedAccountTextView.setText(mAuth.getCurrentUser().getUid());
+//                    mUsernameTextView.setText(mAuth.getCurrentUser().getEmail().concat("\n"));
+//                    mWhenCreatedAccountTextView.setText(mAuth.getCurrentUser().getUid());
+
                 } else {
                     // User is signed out
                     Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
@@ -45,11 +72,27 @@ public class GameRoomActivity extends FirebaseUserActivity {
         });
 
         initViews();
+
+        mGameAdapter = new FirebaseListAdapter<Game>(this, Game.class, android.R.layout.two_line_list_item, mGamesRef) {
+            @Override
+            protected void populateView(View view, Game game, int position) {
+                Log.d("PopulatingGameList", String.format("Incoming game from creator '%s'", game.getCreator()));
+                ((TextView)view.findViewById(android.R.id.text1)).setText(game.getCreator());
+            }
+        };
+        mGameList.setAdapter(mGameAdapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mGameAdapter.cleanup();
     }
 
     private void initViews() {
-        mUsernameTextView = (TextView) findViewById(R.id.username_textview);
-        mWhenCreatedAccountTextView = (TextView) findViewById(R.id.created_account_time_textview);
+//        mUsernameTextView = (TextView) findViewById(R.id.);
+//        mWhenCreatedAccountTextView = (TextView) findViewById(R.id.created_account_time_textview);
+        mGameList = (ListView) findViewById(R.id.gameList);
     }
 
     @Override
@@ -68,6 +111,29 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void onCreateGame(View view) {
+    }
+
+    public static class Game {
+        private String mCreator;
+
+        public Game() {
+            // needed for firebase
+        }
+
+        public String getCreator() {
+            return mCreator;
+        }
+
+        public void setCreator(String creator) {
+            this.mCreator = creator;
+        }
+
+        public Game(String creator) {
+            mCreator = creator;
         }
     }
 }
