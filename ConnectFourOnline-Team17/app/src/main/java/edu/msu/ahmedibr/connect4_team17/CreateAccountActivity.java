@@ -146,6 +146,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             try {
                                 throw task.getException();
@@ -159,9 +162,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                                 makeSnack(R.string.unhandled_error, Snackbar.LENGTH_LONG);
                                 return;
                             }
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
                         }
 
                         Log.d(AUTH_STATUS_TAG, "createUserWithEmail:onComplete:" + task.getResult());
