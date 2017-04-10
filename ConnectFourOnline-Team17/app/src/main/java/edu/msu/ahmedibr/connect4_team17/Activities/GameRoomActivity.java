@@ -206,7 +206,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
-                                        getCurrentGame();
+                                        setCurrentGame(dataSnapshot.getValue(DatabaseModels.Game.class));
                                         checkGameState();
                                         finish();
                                     }

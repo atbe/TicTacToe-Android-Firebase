@@ -71,18 +71,9 @@ public class GameActivity extends FirebaseUserActivity {
                         Log.d("GameStateChange", "The game state has changed.");
                         makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
 
-                        mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
-                            @Override
-                            public Transaction.Result doTransaction(MutableData mutableData) {
-                                Log.d("GameStateChange", "Reloading game...");
-                                loadGameFromJson(mutableData.child(mCurrentGameKey)
-                                        .child(GAME_GAME_DUMP_KEY).getValue(String.class));
-                                return Transaction.success(mutableData);
-                            }
-
-                            @Override
-                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
-                        });
+                        Log.d("GameStateChange", "Reloading game...");
+                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                        mConnectFourView.invalidate();
                     }
 
                     @Override
