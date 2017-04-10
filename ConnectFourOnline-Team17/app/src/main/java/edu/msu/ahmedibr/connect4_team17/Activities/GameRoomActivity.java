@@ -25,6 +25,7 @@ import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
 import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
+import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
@@ -42,6 +43,12 @@ public class GameRoomActivity extends FirebaseUserActivity {
      * Listview adapter for the open games.
      */
     private FirebaseListAdapter mOpenGamesAdapter;
+
+    private boolean mAmGameCreator = false;
+
+    private void setAmGameCreator(boolean f) {
+        mAmGameCreator = f;
+    }
 
     @Override
     protected void onStart() {
@@ -210,6 +217,8 @@ public class GameRoomActivity extends FirebaseUserActivity {
                             mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
                             mCurrentGameKey = snapshot.getKey();
 
+                            setAmGameCreator(true);
+
 //                            makeSnack("You're in a game you created", Snackbar.LENGTH_LONG);
                             checkGameState();
                         }
@@ -234,6 +243,8 @@ public class GameRoomActivity extends FirebaseUserActivity {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
                             mCurrentGameKey = snapshot.getKey();
+
+                            setAmGameCreator(false);
 
                             checkGameState();
                         }
@@ -276,6 +287,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
         mCurrentGame = null;
         Intent launchGame = new Intent(this, GameActivity.class);
         launchGame.putExtra(CURRENT_GAME_BUNDLE_KEY, mCurrentGameKey);
+        launchGame.putExtra(AM_CREATOR_BUNDLE_KEY, mAmGameCreator);
 
         startActivity(launchGame);
         // do not finish. if the user ends the game they should come back to the list of players

@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 
 /**
@@ -177,6 +179,14 @@ public class ConnectFourView extends View {
      */
     public boolean isThereATie() {
         return game.isThereATie();
+    }
+
+    public String putStateToJson() {
+        return game.toJsonString();
+    }
+
+    public void loadGameFromJson(String json) {
+        game.loadFromJson(json);
     }
 }
 

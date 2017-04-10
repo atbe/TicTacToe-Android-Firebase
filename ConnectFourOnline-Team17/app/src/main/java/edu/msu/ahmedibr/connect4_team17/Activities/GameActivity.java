@@ -2,17 +2,34 @@ package edu.msu.ahmedibr.connect4_team17.Activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
 
 import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourGame;
 import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourView;
 import edu.msu.ahmedibr.connect4_team17.R;
 
-public class GameActivity extends AppCompatActivity {
+import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
+import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_GAME_DUMP_KEY;
+
+public class GameActivity extends FirebaseUserActivity {
     public static final String PLAYER_ONE_NAME_BUNDLE_KEY = "com.cse476.team17.player_one_name_bundle";
     public static final String PLAYER_TWO_NAME_BUNDLE_KEY = "com.cse476.team17.player_two_name_bundle";
 
@@ -31,10 +48,53 @@ public class GameActivity extends AppCompatActivity {
      */
     String mLoserName = null;
 
+    private String mCurrentGameKey;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        mCurrentGameKey = getIntent().getStringExtra(CURRENT_GAME_BUNDLE_KEY);
+        boolean amCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
+
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // TODO: Other player made a change to game state,
+                        // load it
+                        Log.d("GameStateChange", "The game state has changed.");
+
+                        if (dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
+                            Log.d("GameStateChange", "Reloading game...");
+                            loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+
+
+        setAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+
+                } else {
+
+                    // User is signed out
+                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
+
+                    // close the game room
+                    finish();
+                }
+            }
+        });
 
         // set the GameView and set the current player textview
         mConnectFourView = (ConnectFourView)findViewById(R.id.connectFourView);
@@ -46,6 +106,58 @@ public class GameActivity extends AppCompatActivity {
         if(savedInstanceState != null) {
             mConnectFourView.getFromBundle(savedInstanceState);
             // TODO: If activity needs to restore anything.
+        }
+
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
+                            initializeFirebaseGame();
+                            return;
+                        }
+
+                        Log.d("CheckInitialGameState", "Resuming already started game.");
+                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+    }
+
+    private void initializeFirebaseGame() {
+        Log.d("initializeFirebaseGame", "Initializing...");
+        String jsonString = gameToJsonString();
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .child(GAME_GAME_DUMP_KEY)
+                .setValue(jsonString);
+    }
+
+    private String gameToJsonString() {
+        return mConnectFourView.putStateToJson();
+    }
+
+    private void loadGameFromJson(String json) {
+        mConnectFourView.loadGameFromJson(json);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.game_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_sign_out:
+                FirebaseAuth.getInstance().signOut();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -85,6 +197,8 @@ public class GameActivity extends AppCompatActivity {
                         int winningPlayerId = mConnectFourView.getCurrentPlayerId() == ConnectFourGame.PLAYER_ONE_ID ?
                                 ConnectFourGame.PLAYER_TWO_ID : ConnectFourGame.PLAYER_ONE_ID;
 
+                        // TODO: Update game state and winner/loser here
+
                         setWinnerAndLoserNames(winningPlayerId);
                         moveToWinnerActivity();
                     }
@@ -113,6 +227,11 @@ public class GameActivity extends AppCompatActivity {
         else if (mConnectFourView.isThereATie()) {
             this.moveToWinnerActivityWithTie();
         }
+
+        // TODO: Push new game state
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .child(GAME_GAME_DUMP_KEY)
+                .setValue(gameToJsonString());
     }
 
     /**
