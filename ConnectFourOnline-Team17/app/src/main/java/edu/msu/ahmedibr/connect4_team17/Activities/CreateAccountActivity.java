@@ -100,7 +100,9 @@ public class CreateAccountActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // hook re authentication listener
-        mAuth.addAuthStateListener(mAuthListener);
+        if (mAuth != null) {
+            mAuth.addAuthStateListener(mAuthListener);
+        }
     }
 
     /**
