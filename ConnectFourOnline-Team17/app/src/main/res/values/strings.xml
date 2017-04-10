@@ -5,6 +5,12 @@
     <string name="main_lets_play_title">Let\'s Play Connect 4!</string>
     <string name="player_one_name_prompt">Player 1 Name</string>
     <string name="player_two_name_prompt">Player 2 Name</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login_btn">Login</string>
+    <string name="rememberLogIn">Keep me signed in</string>
     <string name="start_game_button">Start Game</string>
     <string name="name_of_loser">INSERT LOSER</string>
     <string name="name_of_winner">INSERT WINNER</string>

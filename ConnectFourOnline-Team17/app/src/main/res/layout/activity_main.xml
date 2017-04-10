@@ -4,7 +4,7 @@
     android:id="@+id/main_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.msu.ahmedibr.connect4_team17.MainActivity">
+    tools:context="edu.msu.ahmedibr.connect4_team17.LoginActivity">
 
     <RelativeLayout
     android:layout_width="match_parent"
@@ -24,50 +24,60 @@
         android:layout_height="wrap_content" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/playerOneNameInputLayout"
+        android:id="@+id/UsernameLayout"
         android:layout_below="@id/main_lets_play_title"
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <android.support.design.widget.TextInputEditText
-            android:id="@+id/playerOneInput"
-            android:textSize="20sp"
+            android:id="@+id/usernameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/player_one_name_prompt"
-            android:inputType="textPersonName"/>
+            android:hint="@string/username_hint"
+            android:inputType="textPersonName"
+            android:textSize="20sp" />
 
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/playerTwoNameInputLayout"
-        android:layout_below="@id/playerOneNameInputLayout"
-        android:layout_alignStart="@id/playerOneNameInputLayout"
-        android:layout_marginTop="50dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/playerTwoInput"
-            android:textSize="20sp"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/PasswordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/player_two_name_prompt"
-            android:inputType="textPersonName"/>
-    </android.support.design.widget.TextInputLayout>
+            android:layout_alignStart="@id/UsernameLayout"
+            android:layout_below="@id/UsernameLayout"
+            android:layout_marginTop="50dp">
 
-    <Button android:id="@+id/startGameButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/start_game_button"
-        android:layout_width="match_parent"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:textSize="20sp"
-        android:backgroundTint="@android:color/holo_blue_light"
-        android:layout_height="wrap_content"
-        android:onClick="onStartGame" />
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password_hint"
+                android:inputType="textPassword"
+                android:textSize="20sp" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@android:color/holo_blue_light"
+            android:onClick="onLogin"
+            android:paddingBottom="20dp"
+            android:paddingTop="20dp"
+            android:text="@string/login_btn"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/rememberLogIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/PasswordLayout"
+            android:layout_marginTop="15dp"
+            android:text="@string/rememberLogIn" />
 
     </RelativeLayout>
 
