@@ -124,9 +124,9 @@ public class ConnectFourView extends View {
     /**
      * Allows the parent activity to tell the game it's the next players turn
      */
-    public void onMoveDone() {
+    public boolean onMoveDone() {
         // TODO: Check for win here so we can report it to the parent activity
-        game.beginNextPlayersTurn();
+        boolean nextPlayersTurn = game.beginNextPlayersTurn();
 
         int winnerIdNumber = game.checkForWin();
         if (winnerIdNumber != 0) {
@@ -135,6 +135,7 @@ public class ConnectFourView extends View {
 
         setCurrentPlayerName();
         invalidate();
+        return nextPlayersTurn;
     }
 
     /**
@@ -168,6 +169,7 @@ public class ConnectFourView extends View {
         } else {
             Log.e("ConnectFourView", "setCurrentPlayerName name was null!");
         }
+        invalidate();
     }
 
     /**
@@ -207,6 +209,8 @@ public class ConnectFourView extends View {
 
     public void loadGameFromJson(String json) {
         game.loadFromJson(json);
+        setCurrentPlayerName();
+        invalidate();
     }
 
     public boolean isMyTurn() {

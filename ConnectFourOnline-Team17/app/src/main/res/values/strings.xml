@@ -36,6 +36,7 @@
     <string name="login_succeeded">Login succeeded!</string>
     <string name="email_address_invalid">Email address cannot be used to sign up. Is there another account with this email?</string>
     <string name="already_created_game">You already have an Open game created!</string>
+    <string name="cannot_join_your_own_game">You cannot join a game you created!</string>
 
     <!--Buttons-->
     <string name="login_btn">Login</string>

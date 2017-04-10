@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
@@ -114,7 +116,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 DatabaseModels.Game game = (DatabaseModels.Game) adapterView.getItemAtPosition(position);
                 makeSnack(String.format("You pressed game from creator '%s'", game.getCreator()), Snackbar.LENGTH_LONG);
 
-                joinGame(mOpenGamesAdapter.getRef(position).getKey());
+                joinGame(game, mOpenGamesAdapter.getRef(position).getKey());
 
                 // TODO: Join game and update database, start game activity
             }
@@ -187,10 +189,34 @@ public class GameRoomActivity extends FirebaseUserActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // TODO: if someone joins the game we need to jump to game activity
 
-                        if (dataSnapshot.exists()) {
-                            makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
+                        if (!dataSnapshot.exists()) {
+                            mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
+                                @Override
+                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                    mGamesDatabaseRef.push().setValue(game);
+                                    return Transaction.success(mutableData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
+                            });
+                            return;
                         } else {
-                            mGamesDatabaseRef.push().setValue(game);
+                            dataSnapshot.getRef().getParent().child(JOINER_DATA_KEY).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        getCurrentGame();
+                                        checkGameState();
+                                        finish();
+                                    }
+
+                                    makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {}
+                            });
                         }
                     }
 
@@ -265,6 +291,10 @@ public class GameRoomActivity extends FirebaseUserActivity {
     }
 
     private void checkGameState() {
+        if (mCurrentGame == null) {
+            return;
+        }
+
         // if state is STARTED, we need to re-open that game
         if (mCurrentGame.getState() == DatabaseModels.Game.State.STARTED.ordinal()) {
             resumeGame();
@@ -273,14 +303,30 @@ public class GameRoomActivity extends FirebaseUserActivity {
         }
     }
 
-    private void joinGame(String gameId) {
+    private void joinGame(DatabaseModels.Game game, final String gameId) {
         // TODO: if there is currently an open game and I am the creator, remove it
+        if (game.getCreator().getId().equals(mAuth.getCurrentUser().getUid())) {
+            makeSnack(R.string.cannot_join_your_own_game, Snackbar.LENGTH_LONG);
+            return;
+        }
 
-        DatabaseModels.User joiningUser = new DatabaseModels.User(mAuth.getCurrentUser().getDisplayName(), mAuth.getCurrentUser().getUid());
-        mGamesDatabaseRef.child(gameId).child(JOINER_DATA_KEY).setValue(joiningUser);
-        mGamesDatabaseRef.child(gameId).child(GAME_POOL_STATE_KEY).setValue(DatabaseModels.Game.State.STARTED.ordinal());
+        final DatabaseModels.User joiningUser = new DatabaseModels.User(mAuth.getCurrentUser().getDisplayName(), mAuth.getCurrentUser().getUid());
+        mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                mutableData.child(gameId).child(JOINER_DATA_KEY).setValue(joiningUser);
+                mutableData.child(gameId).child(GAME_POOL_STATE_KEY).setValue(DatabaseModels.Game.State.STARTED.ordinal());
+                return Transaction.success(mutableData);
+            }
 
-        beginGameActivity();
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                mCurrentGame = dataSnapshot.child(gameId).getValue(DatabaseModels.Game.class);
+                getCurrentGame();
+                beginGameActivity();
+            }
+        });
+
     }
 
     /**
@@ -296,10 +342,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
         launchGame.putExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY, mCurrentGame.getJoiner().getDisplayName());
         launchGame.putExtra(PLAYER_TWO_UID_BUNDLE_KEY, mCurrentGame.getJoiner().getId());
 
-        mCurrentGame = null; // TODO: Do I really need to do this?
-
         startActivity(launchGame);
+
         // do not finish. if the user ends the game they should come back to the list of players
-        finish();
+//        finish();
     }
 }

@@ -37,6 +37,10 @@ public class FirebaseUserActivity extends AppCompatActivity {
      */
     protected DatabaseReference mGamesDatabaseRef;
 
+    public void setCurrentGame(DatabaseModels.Game mCurrentGame) {
+        this.mCurrentGame = mCurrentGame;
+    }
+
     protected DatabaseModels.Game mCurrentGame = null;
     protected String mCurrentGameKey = null;
 

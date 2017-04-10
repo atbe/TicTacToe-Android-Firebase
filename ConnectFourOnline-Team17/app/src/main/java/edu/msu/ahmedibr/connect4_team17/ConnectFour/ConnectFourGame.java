@@ -198,16 +198,17 @@ public class ConnectFourGame {
     /** Checks if it's valid to change turns yet, and if so, changes turns
      *
      */
-    public void beginNextPlayersTurn() {
+    public boolean beginNextPlayersTurn() {
         if (mChosenCell == null) {
             Snackbar.make(mParentActivityContext.findViewById(R.id.game_activity_coordinator_layout),
                     mParentActivityContext.getResources().getText(R.string.no_move_played), Snackbar.LENGTH_LONG).show();
 //            Log.d("ConnectFourGame", "User clicked done without making move!");
-            return;
+            return false;
         }
 
-        mCurrentPlayer = mCurrentPlayer == mPlayerOne ? mPlayerTwo : mPlayerOne;
+        mCurrentPlayer = mCurrentPlayer.getPlayerId() == mPlayerOne.getPlayerId() ? mPlayerTwo : mPlayerOne;
         beginPlayerMove();
+        return true;
     }
 
     /** Draws the Grid and tells the cells to draw themselves

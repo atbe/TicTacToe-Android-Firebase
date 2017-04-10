@@ -17,7 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
 
@@ -60,17 +63,26 @@ public class GameActivity extends FirebaseUserActivity {
         boolean amCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
 
         mGamesDatabaseRef.child(mCurrentGameKey)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // TODO: Other player made a change to game state,
                         // load it
                         Log.d("GameStateChange", "The game state has changed.");
+                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
 
-                        if (dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
-                            Log.d("GameStateChange", "Reloading game...");
-                            loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
-                        }
+                        mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
+                            @Override
+                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                Log.d("GameStateChange", "Reloading game...");
+                                loadGameFromJson(mutableData.child(mCurrentGameKey)
+                                        .child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                                return Transaction.success(mutableData);
+                            }
+
+                            @Override
+                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
+                        });
                     }
 
                     @Override
@@ -115,7 +127,18 @@ public class GameActivity extends FirebaseUserActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
-                            initializeFirebaseGame();
+                            dataSnapshot.getRef().runTransaction(new Transaction.Handler() {
+                                @Override
+                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                    initializeFirebaseGame();
+                                    return Transaction.success(mutableData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                }
+                            });
+
                             return;
                         }
 
@@ -130,10 +153,22 @@ public class GameActivity extends FirebaseUserActivity {
 
     private void initializeFirebaseGame() {
         Log.d("initializeFirebaseGame", "Initializing...");
-        String jsonString = gameToJsonString();
-        mGamesDatabaseRef.child(mCurrentGameKey)
-                .child(GAME_GAME_DUMP_KEY)
-                .setValue(jsonString);
+        final String jsonString = gameToJsonString();
+
+        mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                mutableData.child(mCurrentGameKey)
+                        .child(GAME_GAME_DUMP_KEY)
+                        .setValue(jsonString);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+            }
+        });
     }
 
     private String gameToJsonString() {
@@ -229,20 +264,38 @@ public class GameActivity extends FirebaseUserActivity {
             makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
             return;
         }
-        mConnectFourView.onMoveDone();
+
+        if (!mConnectFourView.onMoveDone()) {
+            // to not update state as the move has not actually changed
+            return;
+        }
 
         if (mConnectFourView.isGameWon()) {
            setWinnerAndLoserNames(mConnectFourView.getWinningPlayerId());
            moveToWinnerActivity();
+
+            // TODO: CHange game state in database
+            // TODO: Send names to winning activity
         }
         else if (mConnectFourView.isThereATie()) {
             this.moveToWinnerActivityWithTie();
+            // TODO: CHange game state in database
+            // TODO: Send names to winning activity
         }
 
-        // TODO: Push new game state
         mGamesDatabaseRef.child(mCurrentGameKey)
-                .child(GAME_GAME_DUMP_KEY)
-                .setValue(gameToJsonString());
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        mutableData.child(GAME_GAME_DUMP_KEY)
+                                .setValue(gameToJsonString());
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                    }
+                });
     }
 
     /**
@@ -290,11 +343,13 @@ public class GameActivity extends FirebaseUserActivity {
      */
     private void moveToWinnerActivityWithTie() {
         Intent intent = new Intent(this, WinnerActivity.class);
+
         mWinnerName = getIntent().getStringExtra(PLAYER_ONE_NAME_BUNDLE_KEY);
         mLoserName = getIntent().getStringExtra(PLAYER_TWO_NAME_BUNDLE_KEY);
         intent.putExtra(WinnerActivity.TIE_GAME_BUNDLE_KEY, true);
         intent.putExtra(WinnerActivity.WINNING_PLAYER_NAME_BUNDLE_KEY, mWinnerName);
         intent.putExtra(WinnerActivity.LOSING_PLAYER_NAME_BUNDLE_KEY, mLoserName);
+
         startActivity(intent);
         finish();
     }
