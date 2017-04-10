@@ -3,6 +3,7 @@ package edu.msu.ahmedibr.connect4_team17.Activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,9 +50,6 @@ public class GameActivity extends FirebaseUserActivity {
     String mLoserName = null;
 
     private String mCurrentGameKey;
-
-    private String mCreatorUsername;
-    private String mJoinerUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +99,8 @@ public class GameActivity extends FirebaseUserActivity {
 
         // set the GameView and set the current player textview
         mConnectFourView = (ConnectFourView)findViewById(R.id.connectFourView);
-        mConnectFourView.beginGame((TextView)findViewById(R.id.current_player_name_textview));
+        mConnectFourView.beginGame((TextView)findViewById(R.id.current_player_name_textview),
+                mAuth.getCurrentUser().getUid());
 
         /*
          * Restore any state
@@ -189,6 +188,11 @@ public class GameActivity extends FirebaseUserActivity {
      * @param view: TODO: either the game or Connect4View
      */
     public void onSurrender(View view) {
+        if (!mConnectFourView.isMyTurn()) {
+            makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("Surrender")
@@ -221,6 +225,10 @@ public class GameActivity extends FirebaseUserActivity {
      * @param view The button.
      */
     public void onMoveDone(View view) {
+        if (!mConnectFourView.isMyTurn()) {
+            makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
+            return;
+        }
         mConnectFourView.onMoveDone();
 
         if (mConnectFourView.isGameWon()) {
@@ -289,5 +297,13 @@ public class GameActivity extends FirebaseUserActivity {
         intent.putExtra(WinnerActivity.LOSING_PLAYER_NAME_BUNDLE_KEY, mLoserName);
         startActivity(intent);
         finish();
+    }
+
+
+    public void makeSnack(String string, int length) {
+        Snackbar.make(
+                findViewById(R.id.game_activity_coordinator_layout),
+                string,
+                length).show();
     }
 }

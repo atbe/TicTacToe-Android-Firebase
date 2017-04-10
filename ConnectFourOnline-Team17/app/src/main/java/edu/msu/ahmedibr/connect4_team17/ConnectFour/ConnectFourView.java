@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -38,6 +39,8 @@ public class ConnectFourView extends View {
      */
     private int winningPlayerId = 0;
 
+    private String mMyPlayerUid;
+
     /**
      * Used to check if the game has been won.
      * The game is won if the id of the winner is diff from 0.
@@ -64,6 +67,10 @@ public class ConnectFourView extends View {
      */
     public int getCurrentPlayerId() {
         return game.getCurrentPlayerId();
+    }
+
+    public String getCurrentPlayerUid() {
+        return game.getCurrentPlayerUid();
     }
 
     public ConnectFourView(Context context) {
@@ -104,6 +111,11 @@ public class ConnectFourView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isMyTurn()) {
+            mGameActivity.makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
+            return false;
+        }
+
         boolean isHandled = game.onTouchEvent(this, event);
         invalidate();
         return isHandled;
@@ -130,11 +142,12 @@ public class ConnectFourView extends View {
      *
      * @param currentPlayerNameTextView The textview that holds the current players name
      */
-    public void beginGame(TextView currentPlayerNameTextView) {
+    public void beginGame(TextView currentPlayerNameTextView, String myPlayerUid) {
         // safety check, otherwise I want the app to crash because something went wrong
         assert currentPlayerNameTextView != null;
 
         mCurrentPlayerNameTextView = currentPlayerNameTextView;
+        mMyPlayerUid = myPlayerUid;
         game.beginGame();
 
         setCurrentPlayerName();
@@ -194,6 +207,10 @@ public class ConnectFourView extends View {
 
     public void loadGameFromJson(String json) {
         game.loadFromJson(json);
+    }
+
+    public boolean isMyTurn() {
+        return game.getCurrentPlayerUid().equals(mMyPlayerUid);
     }
 }
 

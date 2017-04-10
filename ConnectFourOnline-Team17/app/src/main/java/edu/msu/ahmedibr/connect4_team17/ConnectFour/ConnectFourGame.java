@@ -540,4 +540,11 @@ public class ConnectFourGame {
             mLastChosenCell = gson.fromJson(jsonObject.get(LAST_CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
         }
     }
+
+    public String getCurrentPlayerUid() {
+        if (mCurrentPlayer != null) {
+            return mCurrentPlayer.getPlayerUid();
+        }
+        return null;
+    }
 }
