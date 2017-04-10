@@ -23,4 +23,11 @@ public class Constants {
     public static final String GAME_POOL_STATE_KEY = "state";
 
     public static final String FAKE_EMAIL_DOMAIN_URL = "@tictactoefor476appyo.com";
+
+
+    /**
+     * Bundle keys
+     */
+    public static final String CURRENT_GAME_BUNDLE_KEY = "com.connectfour.currentgame.id.bundle";
+
 }

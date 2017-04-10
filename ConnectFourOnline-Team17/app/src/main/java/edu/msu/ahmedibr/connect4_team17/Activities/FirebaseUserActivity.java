@@ -1,14 +1,24 @@
 package edu.msu.ahmedibr.connect4_team17.Activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
+
+import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAMES_DATABASE_ROOT_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.USER_ID_KEY;
 
 public class FirebaseUserActivity extends AppCompatActivity {
     /// authentication agent
@@ -23,9 +33,12 @@ public class FirebaseUserActivity extends AppCompatActivity {
     protected DatabaseReference mDatabaseRootRef;
 
     /**
-     * Firebase database references
+     * Firebase games database references
      */
     protected DatabaseReference mGamesDatabaseRef;
+
+    protected DatabaseModels.Game mCurrentGame = null;
+    protected String mCurrentGameKey = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,9 +72,5 @@ public class FirebaseUserActivity extends AppCompatActivity {
 
     public void setAuthStateListener(FirebaseAuth.AuthStateListener listner) {
         mAuthListener = listner;
-    }
-
-    public boolean isUserInGame() {
-        return true;
     }
 }
