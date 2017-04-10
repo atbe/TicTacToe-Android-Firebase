@@ -25,12 +25,19 @@ public class Constants {
 
     public static final String FAKE_EMAIL_DOMAIN_URL = "@tictactoefor476appyo.com";
 
-
     /**
      * Bundle keys
      */
     public static final String CURRENT_GAME_BUNDLE_KEY = "com.connectfour.currentgame.id.bundle";
     public static final String AM_CREATOR_BUNDLE_KEY = "com.connectfour.amcreator.id.bundle";
+    public static final String PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY = "com.connectfour.playerone_displayname.bundle";
+    public static final String PLAYER_ONE_UID_BUNDLE_KEY = "com.connectfour.playerone_uid.bundle";
+    public static final String PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY = "com.connectfour.playertwo_displayname.bundle";
+    public static final String PLAYER_TWO_UID_BUNDLE_KEY = "com.connectfour.playertwo_uid.bundle";
+
+    /**
+     * json dump keys
+     */
     public static final String PLAYER_ONE_JSON_KEY = "com.connectfour.player_one.json.key";
     public static final String PLAYER_TWO_JSON_KEY = "com.connectfour.player_two.json.key";
     public static final String OWNERSHIP_TABLE_JSON_KEY = "com.connectfour.ownership.json.key";
@@ -39,10 +46,5 @@ public class Constants {
     public static final String CHOSEN_CELL_JSON_KEY = "com.connectfour.chosen_cell.json.key";
 
 
-
-
-    /**
-     * json dump keys
-     */
 
 }

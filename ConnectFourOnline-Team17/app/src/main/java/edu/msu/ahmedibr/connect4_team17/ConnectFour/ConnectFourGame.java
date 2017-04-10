@@ -156,13 +156,14 @@ public class ConnectFourGame {
      * @param playerOneName: name of player 1
      * @param playerTwoName: name of player 2
      */
-    public ConnectFourGame(GameActivity context, String playerOneName, String playerTwoName) {
+    public ConnectFourGame(GameActivity context, String playerOneName, String playerOneUid,
+                           String playerTwoName, String playerTwoUid) {
         // create the players
         // TODO: Player one always green disk?
         mPlayerOne = new ConnectFourPlayer(playerOneName, R.drawable.spartan_green_player_one,
-                PLAYER_ONE_ID);
+                PLAYER_ONE_ID, playerOneUid);
         mPlayerTwo = new ConnectFourPlayer(playerTwoName, R.drawable.spartan_white_player_two,
-                PLAYER_TWO_ID);
+                PLAYER_TWO_ID, playerTwoUid);
 
         mParentActivityContext = context;
 

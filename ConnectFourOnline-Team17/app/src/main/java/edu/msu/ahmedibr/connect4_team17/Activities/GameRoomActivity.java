@@ -30,6 +30,10 @@ import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_UID_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.USER_ID_KEY;
 
 public class GameRoomActivity extends FirebaseUserActivity {
@@ -284,10 +288,15 @@ public class GameRoomActivity extends FirebaseUserActivity {
      */
     private void beginGameActivity() {
         // TODO: Launch into the next activity
-        mCurrentGame = null;
         Intent launchGame = new Intent(this, GameActivity.class);
         launchGame.putExtra(CURRENT_GAME_BUNDLE_KEY, mCurrentGameKey);
         launchGame.putExtra(AM_CREATOR_BUNDLE_KEY, mAmGameCreator);
+        launchGame.putExtra(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY, mCurrentGame.getCreator().getDisplayName());
+        launchGame.putExtra(PLAYER_ONE_UID_BUNDLE_KEY, mCurrentGame.getCreator().getId());
+        launchGame.putExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY, mCurrentGame.getJoiner().getDisplayName());
+        launchGame.putExtra(PLAYER_TWO_UID_BUNDLE_KEY, mCurrentGame.getJoiner().getId());
+
+        mCurrentGame = null; // TODO: Do I really need to do this?
 
         startActivity(launchGame);
         // do not finish. if the user ends the game they should come back to the list of players

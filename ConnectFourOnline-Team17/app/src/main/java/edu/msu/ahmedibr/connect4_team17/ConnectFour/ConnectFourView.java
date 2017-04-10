@@ -14,6 +14,11 @@ import org.json.JSONObject;
 
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_UID_BUNDLE_KEY;
+
 /**
  * TODO: document your custom view class.
  */
@@ -80,12 +85,14 @@ public class ConnectFourView extends View {
         Bundle parentBundle = ((Activity)getContext()).getIntent().getExtras();
 
         // the game activity should have had the names of the players passed to it.
-        String playerOneName = parentBundle.getString(GameActivity.PLAYER_ONE_NAME_BUNDLE_KEY);
-        String playerTwoName = parentBundle.getString(GameActivity.PLAYER_TWO_NAME_BUNDLE_KEY);
+        String playerOneName = parentBundle.getString(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY);
+        String playerOneUid = parentBundle.getString(PLAYER_ONE_UID_BUNDLE_KEY);
+        String playerTwoName = parentBundle.getString(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY);
+        String playerTwoUid = parentBundle.getString(PLAYER_TWO_UID_BUNDLE_KEY);
 
         mGameActivity = (GameActivity) getContext();
 
-        game = new ConnectFourGame(mGameActivity, playerOneName, playerTwoName);
+        game = new ConnectFourGame(mGameActivity, playerOneName, playerOneUid, playerTwoName, playerTwoUid);
     }
 
     @Override

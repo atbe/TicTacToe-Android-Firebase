@@ -40,6 +40,8 @@ public class ConnectFourPlayer {
         return mPlayerId;
     }
 
+    private String mPlayerUid;
+
     /**
      * Constructor of a ConnectFourPlayer.
      *
@@ -47,9 +49,18 @@ public class ConnectFourPlayer {
      * @param diskImageResourceId The resourceid of the disk used for this player.
      * @param playerId The unique id of the player.
      */
-    public ConnectFourPlayer(String mName, int diskImageResourceId, int playerId) {
+    public ConnectFourPlayer(String mName, int diskImageResourceId, int playerId, String uid) {
         this.mName = mName;
         this.mDiskImageResourceId = diskImageResourceId;
         this.mPlayerId = playerId;
+        this.mPlayerUid = uid;
+    }
+
+    public String getPlayerUid() {
+        return mPlayerUid;
+    }
+
+    public void setPlayerUid(String mPlayerUid) {
+        this.mPlayerUid = mPlayerUid;
     }
 }

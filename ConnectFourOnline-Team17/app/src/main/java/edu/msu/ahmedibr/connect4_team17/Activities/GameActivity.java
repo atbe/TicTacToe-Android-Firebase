@@ -50,6 +50,9 @@ public class GameActivity extends FirebaseUserActivity {
 
     private String mCurrentGameKey;
 
+    private String mCreatorUsername;
+    private String mJoinerUsername;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
