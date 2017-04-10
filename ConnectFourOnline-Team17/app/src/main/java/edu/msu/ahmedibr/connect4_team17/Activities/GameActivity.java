@@ -20,18 +20,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.annotations.SerializedName;
-
-import org.json.JSONObject;
 
 import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourGame;
 import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourView;
+import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
 import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_GAME_DUMP_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 
 public class GameActivity extends FirebaseUserActivity {
     public static final String PLAYER_ONE_NAME_BUNDLE_KEY = "com.cse476.team17.player_one_name_bundle";
@@ -59,28 +58,6 @@ public class GameActivity extends FirebaseUserActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        mCurrentGameKey = getIntent().getStringExtra(CURRENT_GAME_BUNDLE_KEY);
-        boolean amCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
-
-        mGamesDatabaseRef.child(mCurrentGameKey)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // TODO: Other player made a change to game state,
-                        // load it
-                        Log.d("GameStateChange", "The game state has changed.");
-                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
-
-                        Log.d("GameStateChange", "Reloading game...");
-                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
-                        mConnectFourView.invalidate();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
-
-
         setAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -100,10 +77,40 @@ public class GameActivity extends FirebaseUserActivity {
             }
         });
 
+        // get the game key and whether I'm creator from the bundle
+        mCurrentGameKey = getIntent().getStringExtra(CURRENT_GAME_BUNDLE_KEY);
+        final boolean amCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
+
         // set the GameView and set the current player textview
         mConnectFourView = (ConnectFourView)findViewById(R.id.connectFourView);
         mConnectFourView.beginGame((TextView)findViewById(R.id.current_player_name_textview),
                 mAuth.getCurrentUser().getUid());
+
+        // setup the data listener and send the initial game state if needed
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // TODO: Other player made a change to game state,
+                        // load it
+                        Log.d("GameStateChange", "The game state has changed.");
+                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
+
+                        if (dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class) == DatabaseModels.Game.State.JOINED.ordinal()
+                                && amCreator) {
+                            // will run in transaction
+                            initializeFirebaseGame();
+                            Log.d("GameStateChange", "Initializing game");
+                        } else {
+                            loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                            mConnectFourView.invalidate();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
 
         /*
          * Restore any state
@@ -113,52 +120,59 @@ public class GameActivity extends FirebaseUserActivity {
             // TODO: If activity needs to restore anything.
         }
 
-        mGamesDatabaseRef.child(mCurrentGameKey)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
-                            dataSnapshot.getRef().runTransaction(new Transaction.Handler() {
-                                @Override
-                                public Transaction.Result doTransaction(MutableData mutableData) {
-                                    initializeFirebaseGame();
-                                    return Transaction.success(mutableData);
-                                }
-
-                                @Override
-                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                                }
-                            });
-
-                            return;
-                        }
-
-                        Log.d("CheckInitialGameState", "Resuming already started game.");
-                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
+//        mGamesDatabaseRef.child(mCurrentGameKey)
+//                .addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        if (!dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
+//                            dataSnapshot.getRef().runTransaction(new Transaction.Handler() {
+//                                @Override
+//                                public Transaction.Result doTransaction(MutableData mutableData) {
+//                                    initializeFirebaseGame();
+//                                    return Transaction.success(mutableData);
+//                                }
+//
+//                                @Override
+//                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+//                                }
+//                            });
+//
+//                            return;
+//                        }
+//
+//                        Log.d("CheckInitialGameState", "Resuming already started game.");
+//                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {}
+//                });
     }
 
+    /**
+     * This is run by the creator of the game. It starts a new ConnectFourGame and pushes the game
+     * state to Firebase. Once the game is initialized the state should be
+     */
     private void initializeFirebaseGame() {
         Log.d("initializeFirebaseGame", "Initializing...");
-        final String jsonString = gameToJsonString();
 
         mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
+                // dump the game to json string so we can push it to the database
+                String jsonString = gameToJsonString();
                 mutableData.child(mCurrentGameKey)
                         .child(GAME_GAME_DUMP_KEY)
                         .setValue(jsonString);
+                // now the game hsa been started
+                mutableData.child(mCurrentGameKey)
+                        .child(GAME_POOL_STATE_KEY)
+                        .setValue(DatabaseModels.Game.State.STARTED.ordinal());
                 return Transaction.success(mutableData);
             }
 
             @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-
-            }
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
         });
     }
 
