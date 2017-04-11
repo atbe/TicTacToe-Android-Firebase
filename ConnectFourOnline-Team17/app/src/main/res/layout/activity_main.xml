@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_coordinator_layout"
+    android:id="@+id/login_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="edu.msu.ahmedibr.connect4_team17.LoginActivity">
@@ -57,19 +57,6 @@
                 android:textSize="20sp" />
         </android.support.design.widget.TextInputLayout>
 
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:backgroundTint="@android:color/holo_blue_light"
-            android:onClick="onLogin"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp"
-            android:text="@string/login_btn"
-            android:textSize="20sp" />
-
         <CheckBox
             android:id="@+id/rememberLogIn"
             android:layout_width="wrap_content"
@@ -78,6 +65,33 @@
             android:layout_below="@+id/PasswordLayout"
             android:layout_marginTop="15dp"
             android:text="@string/rememberLogIn" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:padding="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button android:id="@+id/create_account_button"
+                android:layout_weight="1"
+                android:text="@string/create_account"
+                android:onClick="onStartCreateAccount"
+                android:textSize="18sp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:onClick="onLogin"
+                android:textSize="20sp"
+                android:text="@string/login_btn"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

@@ -48,5 +48,5 @@ captures/
 # dont track private files
 *_private.*
 
-# don't track the step folders
-
+# don't track firebase private files
+google-services.json
