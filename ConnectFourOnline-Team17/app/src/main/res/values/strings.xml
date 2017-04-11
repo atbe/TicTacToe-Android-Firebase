@@ -34,13 +34,9 @@
     <string name="unhandled_error">Unhandled error! Please report to developer.</string>
     <string name="account_created">Account created!</string>
     <string name="login_succeeded">Login succeeded!</string>
-<<<<<<< HEAD
     <string name="email_address_invalid">This email address is already in use. Please try a different email address.</string>
-=======
-    <string name="email_address_invalid">Email address cannot be used to sign up. Is there another account with this email?</string>
     <string name="already_created_game">You already have an open game created!</string>
     <string name="cannot_join_your_own_game">You\'re already in the game you created. You can join a different game if you want!</string>
->>>>>>> e8dfb6f... Updated string.xml
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
