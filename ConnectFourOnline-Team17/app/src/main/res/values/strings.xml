@@ -30,12 +30,13 @@
     <string name="login_failed_snackbar">Login failed. Check your username and password.</string>
     <string name="verify_password_cannot_be_empty">Verify Password field cannot be empty</string>
     <string name="password_and_verify_must_match">Password and Verify Password do not match.</string>
-    <string name="password_not_complex_enough">Password too short! Must be at least 6 characters.</string>
+    <string name="password_not_complex_enough">Your password must be at least 6 characters.</string>
     <string name="unhandled_error">Unhandled error! Please report to developer.</string>
     <string name="account_created">Account created!</string>
     <string name="login_succeeded">Login succeeded!</string>
-    <string name="email_address_invalid">Email address cannot be used to sign up. Is there another account with this email?</string>
-    <string name="already_created_game">You already have an Open game created!</string>
+    <string name="email_address_invalid">This email address is already in use. Please try a different email address.</string>
+    <string name="already_created_game">You already have an open game created!</string>
+    <string name="cannot_join_your_own_game">You\'re already in the game you created. You can join a different game if you want!</string>
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
