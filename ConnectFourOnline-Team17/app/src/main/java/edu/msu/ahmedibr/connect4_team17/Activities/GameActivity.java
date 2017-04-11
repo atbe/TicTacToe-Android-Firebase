@@ -228,11 +228,6 @@ public class GameActivity extends FirebaseUserActivity {
      * @param view: TODO: either the game or Connect4View
      */
     public void onSurrender(View view) {
-        if (!mConnectFourView.isMyTurn()) {
-            makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
-            return;
-        }
-
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("Surrender")
