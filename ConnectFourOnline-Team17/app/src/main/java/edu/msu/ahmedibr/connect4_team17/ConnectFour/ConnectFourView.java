@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 
 /**
  * TODO: document your custom view class.

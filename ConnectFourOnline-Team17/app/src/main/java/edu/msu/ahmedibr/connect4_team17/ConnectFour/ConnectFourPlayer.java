@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 /**
  * Created by abe on 3/5/17.

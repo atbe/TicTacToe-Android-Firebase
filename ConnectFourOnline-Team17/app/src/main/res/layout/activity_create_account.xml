@@ -4,7 +4,7 @@
     android:id="@+id/create_account_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.msu.ahmedibr.connect4_team17.CreateAccountActivity">
+    tools:context="edu.msu.ahmedibr.connect4_team17.Activities.CreateAccountActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

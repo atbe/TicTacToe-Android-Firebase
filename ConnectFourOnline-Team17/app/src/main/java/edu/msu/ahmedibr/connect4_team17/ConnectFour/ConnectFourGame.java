@@ -1,4 +1,4 @@
-package edu.msu.ahmedibr.connect4_team17;
+package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+
+import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
+import edu.msu.ahmedibr.connect4_team17.R;
 
 public class ConnectFourGame {
     /**
