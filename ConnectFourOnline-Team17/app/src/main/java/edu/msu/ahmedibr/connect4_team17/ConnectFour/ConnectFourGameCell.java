@@ -18,10 +18,10 @@ public class ConnectFourGameCell {
     /**
      * The image for the actual piece.
      */
-    private static Bitmap emptyCellImage;
+    transient private static Bitmap emptyCellImage;
 
     // TODO: Making this boy static would save some memory but would need one for green and one for white
-    private Bitmap mDiskImage;
+    transient private Bitmap mDiskImage;
 
     /**
      * Row the cell is in.
@@ -56,7 +56,7 @@ public class ConnectFourGameCell {
      */
     private ConnectFourPlayer mOwningPlayer = null;
 
-    private GameActivity mContext;
+    transient private GameActivity mContext;
 
     /**
      * Gets the id of the player who owns this cell.

@@ -71,6 +71,9 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         initViews();
 
+        // firebase authentication init
+        mAuth = FirebaseAuth.getInstance();
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -100,7 +103,9 @@ public class CreateAccountActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // hook re authentication listener
-        mAuth.addAuthStateListener(mAuthListener);
+        if (mAuthListener != null) {
+            mAuth.addAuthStateListener(mAuthListener);
+        }
     }
 
     /**

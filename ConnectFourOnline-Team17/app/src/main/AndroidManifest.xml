@@ -17,10 +17,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.GameActivity" />
+        <activity android:name=".Activities.GameActivity"
+            android:launchMode="singleTop"/>
         <activity android:name=".Activities.WinnerActivity" />
         <activity android:name=".Activities.CreateAccountActivity" />
-        <activity android:name=".Activities.GameRoomActivity"></activity>
+        <activity android:name=".Activities.GameRoomActivity"
+            android:launchMode="singleTop">
+        </activity>
     </application>
 
 </manifest>

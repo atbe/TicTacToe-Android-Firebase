@@ -1,5 +1,6 @@
 package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -7,11 +8,25 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 import edu.msu.ahmedibr.connect4_team17.R;
+
+import static edu.msu.ahmedibr.connect4_team17.Constants.CHOSEN_CELL_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_PLAYER_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.LAST_CHOSEN_CELL_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.OWNERSHIP_TABLE_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_JSON_KEY;
 
 public class ConnectFourGame {
     /**
@@ -51,6 +66,11 @@ public class ConnectFourGame {
     private int marginY;
 
     /**
+     * Initialize once per session for dumping/loading
+     */
+    private Gson gson = new Gson();
+
+    /**
      * The cells in our board.
      *
      * This is a 2d array of the columns.
@@ -84,6 +104,16 @@ public class ConnectFourGame {
      * Used to track the current player who has the move
      */
     private ConnectFourPlayer mCurrentPlayer = null;
+
+    /**
+     * Used to track the last chosen cell of a move.
+     */
+    private ConnectFourGameCell mChosenCell = null;
+
+    /**
+     * Used to store the cell from the last move, used to check for wins.
+     */
+    private ConnectFourGameCell mLastChosenCell = null;
 
     /**
      * Getter for the current players name.
@@ -126,13 +156,14 @@ public class ConnectFourGame {
      * @param playerOneName: name of player 1
      * @param playerTwoName: name of player 2
      */
-    public ConnectFourGame(GameActivity context, String playerOneName, String playerTwoName) {
+    public ConnectFourGame(GameActivity context, String playerOneName, String playerOneUid,
+                           String playerTwoName, String playerTwoUid) {
         // create the players
         // TODO: Player one always green disk?
         mPlayerOne = new ConnectFourPlayer(playerOneName, R.drawable.spartan_green_player_one,
-                PLAYER_ONE_ID);
+                PLAYER_ONE_ID, playerOneUid);
         mPlayerTwo = new ConnectFourPlayer(playerTwoName, R.drawable.spartan_white_player_two,
-                PLAYER_TWO_ID);
+                PLAYER_TWO_ID, playerTwoUid);
 
         mParentActivityContext = context;
 
@@ -155,16 +186,6 @@ public class ConnectFourGame {
     }
 
     /**
-     * Used to track the last chosen cell of a move.
-     */
-    private ConnectFourGameCell mChosenCell = null;
-
-    /**
-     * Used to store the cell from the last move, used to check for wins.
-     */
-    private ConnectFourGameCell mLastChosenCell = null;
-
-    /**
      * This method is used to initialize a players turn.
      */
     private void beginPlayerMove() {
@@ -177,16 +198,17 @@ public class ConnectFourGame {
     /** Checks if it's valid to change turns yet, and if so, changes turns
      *
      */
-    public void beginNextPlayersTurn() {
+    public boolean beginNextPlayersTurn() {
         if (mChosenCell == null) {
             Snackbar.make(mParentActivityContext.findViewById(R.id.game_activity_coordinator_layout),
                     mParentActivityContext.getResources().getText(R.string.no_move_played), Snackbar.LENGTH_LONG).show();
 //            Log.d("ConnectFourGame", "User clicked done without making move!");
-            return;
+            return false;
         }
 
-        mCurrentPlayer = mCurrentPlayer == mPlayerOne ? mPlayerTwo : mPlayerOne;
+        mCurrentPlayer = mCurrentPlayer.getPlayerId() == mPlayerOne.getPlayerId() ? mPlayerTwo : mPlayerOne;
         beginPlayerMove();
+        return true;
     }
 
     /** Draws the Grid and tells the cells to draw themselves
@@ -390,23 +412,8 @@ public class ConnectFourGame {
     public static final String CHOSEN_MOVE_POSITION_ROW_INSTANCE_KEY = "com.connect4_team17.chosenmoverow.savedinstace";
     public static final String CHOSEN_MOVE_POSITION_COLUMN_INSTANCE_KEY = "com.connect4_team17.chosenmovecolumn.savedinstace";
 
-    /**
-     * Used to restore the game state.
-     *
-     * @param savedInstanceState The bundle to restore the state from.
-     */
-    public void getFromBundle(Bundle savedInstanceState) {
-
-        // set the current player
-        mCurrentPlayer = savedInstanceState.getInt(CURRENT_PLAYER_SAVED_INSTACE_KEY)
-                == PLAYER_ONE_ID ? mPlayerOne : mPlayerTwo;
-
-        // begin the players move
-        beginPlayerMove();
-
+    private void loadOwnershipGrid(ArrayList<ArrayList<Integer>> gridOwnershipTable) {
         // restore the grid and disks
-        ArrayList<ArrayList<Integer>> gridOwnershipTable = (ArrayList<ArrayList<Integer>>)
-                savedInstanceState.getSerializable(OWNERSHIP_GRID_SAVED_INSTANCE_KEY);
         for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
             for (int row = 0; row < NUMBER_OF_ROWS; row++) {
                 // if a player owns this cell
@@ -418,6 +425,24 @@ public class ConnectFourGame {
                 }
             }
         }
+    }
+
+    /**
+     * Used to restore the game state.
+     *
+     * @param savedInstanceState The bundle to restore the state from.
+     */
+    public void getFromBundle(Bundle savedInstanceState) {
+
+        // set the current player
+        mCurrentPlayer = savedInstanceState.getInt(CURRENT_PLAYER_SAVED_INSTACE_KEY)
+                == PLAYER_ONE_ID ? mPlayerOne : mPlayerTwo;
+
+        loadOwnershipGrid((ArrayList<ArrayList<Integer>>)
+                savedInstanceState.getSerializable(OWNERSHIP_GRID_SAVED_INSTANCE_KEY));
+
+        // begin the players move
+        beginPlayerMove();
 
         // restore the last chosen cell
         if (savedInstanceState.containsKey(LAST_MOVE_POSITION_COLUMN_INSTANCE_KEY)) {
@@ -434,14 +459,8 @@ public class ConnectFourGame {
         }
     }
 
-    /**
-     * Used to store the state of the game.
-     *
-     * @param outState The bundle to store the state to.
-     */
-    public void putToBundle(Bundle outState) {
+    private ArrayList<ArrayList<Integer>>  buildOwnerShipGrid() {
         ArrayList<ArrayList<Integer>> gridOwnershipTable = new ArrayList<>();
-
         for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
             ArrayList<Integer> columnOwnership = new ArrayList<>();
             for (int row = 0; row < NUMBER_OF_ROWS; row++) {
@@ -450,8 +469,16 @@ public class ConnectFourGame {
             }
             gridOwnershipTable.add(columnOwnership);
         }
+        return gridOwnershipTable;
+    }
 
-        outState.putSerializable(OWNERSHIP_GRID_SAVED_INSTANCE_KEY, gridOwnershipTable);
+    /**
+     * Used to store the state of the game.
+     *
+     * @param outState The bundle to store the state to.
+     */
+    public void putToBundle(Bundle outState) {
+        outState.putSerializable(OWNERSHIP_GRID_SAVED_INSTANCE_KEY, buildOwnerShipGrid());
 
         outState.putSerializable(CURRENT_PLAYER_SAVED_INSTACE_KEY, mCurrentPlayer.getPlayerId());
 
@@ -482,5 +509,43 @@ public class ConnectFourGame {
 
         // Tie Game
         return true;
+    }
+
+    public String toJsonString() {
+        JsonObject json = new JsonObject();
+
+        // save the players
+        json.add(PLAYER_ONE_JSON_KEY, gson.toJsonTree(mPlayerOne));
+        json.add(PLAYER_TWO_JSON_KEY, gson.toJsonTree(mPlayerTwo));
+        json.add(CURRENT_PLAYER_JSON_KEY, gson.toJsonTree(mCurrentPlayer));
+        // and game elements
+        json.add(OWNERSHIP_TABLE_JSON_KEY, gson.toJsonTree(buildOwnerShipGrid()));
+        json.add(LAST_CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mLastChosenCell));
+        json.add(CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mChosenCell));
+
+        return json.toString();
+    }
+
+    public void loadFromJson(String json) {
+        gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+        mPlayerOne = gson.fromJson(jsonObject.get(PLAYER_ONE_JSON_KEY).toString(), ConnectFourPlayer.class);
+        mPlayerTwo = gson.fromJson(jsonObject.get(PLAYER_TWO_JSON_KEY).toString(), ConnectFourPlayer.class);
+        mCurrentPlayer = gson.fromJson(jsonObject.get(CURRENT_PLAYER_JSON_KEY).toString(), ConnectFourPlayer.class);
+        loadOwnershipGrid( (ArrayList<ArrayList<Integer>>) gson.fromJson(
+                jsonObject.get(OWNERSHIP_TABLE_JSON_KEY).toString(), new TypeToken<ArrayList<ArrayList<Integer>>>(){}.getType()));
+        if (jsonObject.has(CHOSEN_CELL_JSON_KEY)) {
+            mChosenCell = gson.fromJson(jsonObject.get(CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
+        }
+        if (jsonObject.has(LAST_CHOSEN_CELL_JSON_KEY)) {
+            mLastChosenCell = gson.fromJson(jsonObject.get(LAST_CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
+        }
+    }
+
+    public String getCurrentPlayerUid() {
+        if (mCurrentPlayer != null) {
+            return mCurrentPlayer.getPlayerUid();
+        }
+        return null;
     }
 }

@@ -4,13 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
+
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_UID_BUNDLE_KEY;
 
 /**
  * TODO: document your custom view class.
@@ -30,6 +38,8 @@ public class ConnectFourView extends View {
      * The id of the winning player. 0 by default indicating no winner.
      */
     private int winningPlayerId = 0;
+
+    private String mMyPlayerUid;
 
     /**
      * Used to check if the game has been won.
@@ -59,6 +69,10 @@ public class ConnectFourView extends View {
         return game.getCurrentPlayerId();
     }
 
+    public String getCurrentPlayerUid() {
+        return game.getCurrentPlayerUid();
+    }
+
     public ConnectFourView(Context context) {
         super(context);
         initView(null, 0);
@@ -78,12 +92,14 @@ public class ConnectFourView extends View {
         Bundle parentBundle = ((Activity)getContext()).getIntent().getExtras();
 
         // the game activity should have had the names of the players passed to it.
-        String playerOneName = parentBundle.getString(GameActivity.PLAYER_ONE_NAME_BUNDLE_KEY);
-        String playerTwoName = parentBundle.getString(GameActivity.PLAYER_TWO_NAME_BUNDLE_KEY);
+        String playerOneName = parentBundle.getString(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY);
+        String playerOneUid = parentBundle.getString(PLAYER_ONE_UID_BUNDLE_KEY);
+        String playerTwoName = parentBundle.getString(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY);
+        String playerTwoUid = parentBundle.getString(PLAYER_TWO_UID_BUNDLE_KEY);
 
         mGameActivity = (GameActivity) getContext();
 
-        game = new ConnectFourGame(mGameActivity, playerOneName, playerTwoName);
+        game = new ConnectFourGame(mGameActivity, playerOneName, playerOneUid, playerTwoName, playerTwoUid);
     }
 
     @Override
@@ -95,6 +111,11 @@ public class ConnectFourView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isMyTurn()) {
+            mGameActivity.makeSnack("It's not your turn!", Snackbar.LENGTH_LONG);
+            return false;
+        }
+
         boolean isHandled = game.onTouchEvent(this, event);
         invalidate();
         return isHandled;
@@ -103,9 +124,9 @@ public class ConnectFourView extends View {
     /**
      * Allows the parent activity to tell the game it's the next players turn
      */
-    public void onMoveDone() {
+    public boolean onMoveDone() {
         // TODO: Check for win here so we can report it to the parent activity
-        game.beginNextPlayersTurn();
+        boolean nextPlayersTurn = game.beginNextPlayersTurn();
 
         int winnerIdNumber = game.checkForWin();
         if (winnerIdNumber != 0) {
@@ -114,6 +135,7 @@ public class ConnectFourView extends View {
 
         setCurrentPlayerName();
         invalidate();
+        return nextPlayersTurn;
     }
 
     /**
@@ -121,11 +143,12 @@ public class ConnectFourView extends View {
      *
      * @param currentPlayerNameTextView The textview that holds the current players name
      */
-    public void beginGame(TextView currentPlayerNameTextView) {
+    public void beginGame(TextView currentPlayerNameTextView, String myPlayerUid) {
         // safety check, otherwise I want the app to crash because something went wrong
         assert currentPlayerNameTextView != null;
 
         mCurrentPlayerNameTextView = currentPlayerNameTextView;
+        mMyPlayerUid = myPlayerUid;
         game.beginGame();
 
         setCurrentPlayerName();
@@ -146,6 +169,7 @@ public class ConnectFourView extends View {
         } else {
             Log.e("ConnectFourView", "setCurrentPlayerName name was null!");
         }
+        invalidate();
     }
 
     /**
@@ -177,6 +201,20 @@ public class ConnectFourView extends View {
      */
     public boolean isThereATie() {
         return game.isThereATie();
+    }
+
+    public String putStateToJson() {
+        return game.toJsonString();
+    }
+
+    public void loadGameFromJson(String json) {
+        game.loadFromJson(json);
+        setCurrentPlayerName();
+        invalidate();
+    }
+
+    public boolean isMyTurn() {
+        return game.getCurrentPlayerUid().equals(mMyPlayerUid);
     }
 }
 

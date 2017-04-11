@@ -33,6 +33,8 @@ dependencies {
 
     // Single target that includes all FirebaseUI libraries above
     compile 'com.firebaseui:firebase-ui:1.2.0'
+
+    compile 'com.google.code.gson:gson:2.7'
 }
 
 
