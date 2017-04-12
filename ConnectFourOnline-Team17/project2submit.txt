@@ -3,42 +3,42 @@ Project 2 Submission
 
 Group Name:   Team 17
 
-When you have completed the project, complete the following form and include it with your project. Include this file as a text file in the folder with your project when you turn it in. 
+When you have completed the project, complete the following form and include it with your project. Include this file as a text file in the folder with your project when you turn it in.
 
 For the Checkpoint, Describe a sequence of operations to create a new account and log onto the server:
 
-A functionality checklist will not be provided for the project. Treat this as you would a request from a client and identify what the client requires. 
+A functionality checklist will not be provided for the project. Treat this as you would a request from a client and identify what the client requires.
 
 Member 1: Josh Benner
 
-Responsiblity: Login and Create Account Layouts, reviewing pull requests, inspiration for waiting room flow diagram
+Responsibility: Login and Create Account Layouts, reviewing pull requests, inspiration for waiting room flow diagram
 
 
 
-Member 2: 
+Member 2: Ibrahim Ahmed
 
-Responsiblity:
-
-
-
-Member 3: 
-
-Responsiblity:
+Responsibility: Setup Firebase project, handled authentication implementation and GameRoomActivity.
 
 
 
-Member 4 (if applicable): 
+Member 3: NONE
 
-Responsiblity:
+Responsibility:
+
+
+
+Member 4 (if applicable): NONE
+
+Responsibility:
 
 
 Provide instructions on how to reach the first editing activity if the login button is not yet functional.
 
 User account the server-side communications is running under:
+Using Firebase. Firebase config json is in the /app directory.
 
-Paths to all server-side scripts: (Such as https://www.cse.msu.edu/~carter/project2/login.php).
+Paths to all server-side scripts: (Such as https://www.cse.msu.edu/~carter/project2/login.php)
+None, using Firebase.
 
 Calls in the code to the server (provide a class name and function, or URL used for debugging):
-
-
-
+No calls to, all calls sent to Firebase.
