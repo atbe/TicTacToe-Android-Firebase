@@ -18,6 +18,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 import edu.msu.ahmedibr.connect4_team17.R;
@@ -147,7 +148,7 @@ public class LoginActivity extends FirebaseUserActivity {
                             Log.w(AUTH_FAILED_TAG, "signInWithEmail:failed", task.getException());
                             try {
                                 throw task.getException();
-                            } catch (FirebaseAuthInvalidCredentialsException e) {
+                            } catch (FirebaseAuthInvalidCredentialsException | FirebaseAuthInvalidUserException e) {
                                 makeSnack(R.string.login_failed_snackbar, Snackbar.LENGTH_LONG);
                                 return;
                             } catch (Exception e) {
