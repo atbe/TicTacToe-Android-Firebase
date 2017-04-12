@@ -31,6 +31,7 @@
     <string name="verify_password_cannot_be_empty">Verify Password field cannot be empty</string>
     <string name="password_and_verify_must_match">Password and Verify Password do not match.</string>
     <string name="password_not_complex_enough">Your password must be at least 6 characters.</string>
+    <string name="username_contains_invalid_chars">Your username contains invalid characters.</string>
     <string name="unhandled_error">Unhandled error! Please report to developer.</string>
     <string name="account_created">Account created!</string>
     <string name="login_succeeded">Login succeeded!</string>

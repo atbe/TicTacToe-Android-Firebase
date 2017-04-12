@@ -26,11 +26,11 @@ import edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourView;
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
-import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_GAME_DUMP_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 
 public class GameActivity extends FirebaseUserActivity {
     public static final String PLAYER_ONE_NAME_BUNDLE_KEY = "com.cse476.team17.player_one_name_bundle";
@@ -64,12 +64,12 @@ public class GameActivity extends FirebaseUserActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
                 } else {
 
                     // User is signed out
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
 
                     // close the game room
                     finish();

@@ -23,7 +23,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import edu.msu.ahmedibr.connect4_team17.R;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.AUTH_FAILED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.FAKE_EMAIL_DOMAIN_URL;
+import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 
 public class LoginActivity extends FirebaseUserActivity {
 
@@ -36,14 +38,6 @@ public class LoginActivity extends FirebaseUserActivity {
      * Password field
      */
     private EditText mPasswordEditText;
-
-
-    /**
-     * Tags
-     */
-    public static final String LOGIN_STATUS_HANGED_TAG = "LOGIN_STATUS_CHANGED";
-    public static final String AUTH_FAILED_TAG = "AUTH_FAILED";
-    public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +53,7 @@ public class LoginActivity extends FirebaseUserActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
                     Intent gameWaitroom = new Intent(getBaseContext(), GameRoomActivity.class);
                     startActivity(gameWaitroom);
@@ -67,7 +61,7 @@ public class LoginActivity extends FirebaseUserActivity {
                     finish();
                 } else {
                     // User is signed out
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
                     // TODO: Add actions to remove user data from preferences close game, and return
                     // to login screen.
                 }
@@ -139,7 +133,7 @@ public class LoginActivity extends FirebaseUserActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(LOGIN_STATUS_HANGED_TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                        Log.d(LOGIN_STATUS_CHANGED_TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the

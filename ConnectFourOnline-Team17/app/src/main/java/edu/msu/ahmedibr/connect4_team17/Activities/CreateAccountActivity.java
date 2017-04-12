@@ -11,7 +11,6 @@ import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
@@ -19,10 +18,13 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import edu.msu.ahmedibr.connect4_team17.Activities.GameRoomActivity;
 import edu.msu.ahmedibr.connect4_team17.R;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.CREATE_ACCOUNT;
+import static edu.msu.ahmedibr.connect4_team17.Constants.EMAIL_BADLY_FORMATTED_EXCEPTION_FIREBASE;
 import static edu.msu.ahmedibr.connect4_team17.Constants.FAKE_EMAIL_DOMAIN_URL;
+import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
+import static edu.msu.ahmedibr.connect4_team17.Constants.WEAK_PASSWORD_EXCEPTION_FIREBASE;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
@@ -52,8 +54,6 @@ public class CreateAccountActivity extends AppCompatActivity {
     /**
      * Tags
      */
-    public static final String LOGIN_STATUS_CHANGED_TAG = "LOGIN_STATUS_CHANGED";
-    public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
 
     @Override
     protected void onStop() {
@@ -164,6 +164,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
+                            Log.w(CREATE_ACCOUNT, "createUserWithEmailAndPassword:failed", task.getException());
                             try {
                                 throw task.getException();
                             } catch (FirebaseAuthWeakPasswordException e) {
@@ -173,16 +174,23 @@ public class CreateAccountActivity extends AppCompatActivity {
                                 makeSnack(R.string.email_address_invalid, Snackbar.LENGTH_LONG);
                                 return;
                             } catch (Exception e) {
+                                // firebase is weird and does not throw FirebaseAuthWeakPasswordException so this is a fail-safe
+                                if (task.getException().getLocalizedMessage().contains(WEAK_PASSWORD_EXCEPTION_FIREBASE)) {
+                                    makeSnack(R.string.password_not_complex_enough, Snackbar.LENGTH_LONG);
+                                    return;
+                                } else if (task.getException().getLocalizedMessage().contains(EMAIL_BADLY_FORMATTED_EXCEPTION_FIREBASE)) {
+                                    makeSnack(R.string.username_contains_invalid_chars, Snackbar.LENGTH_LONG);
+                                    return;
+                                }
                                 makeSnack(R.string.unhandled_error, Snackbar.LENGTH_LONG);
                                 return;
                             }
                         }
 
-                        Log.d(AUTH_STATUS_TAG, "createUserWithEmail:onComplete:" + task.getResult());
+                        Log.d(CREATE_ACCOUNT, "createUserWithEmail:onComplete:" + task.getResult());
 
                         makeSnack(R.string.account_created, Snackbar.LENGTH_LONG);
                     }
                 });
-
     }
 }

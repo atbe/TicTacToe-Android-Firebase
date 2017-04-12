@@ -26,12 +26,12 @@ import com.google.firebase.database.ValueEventListener;
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
-import static edu.msu.ahmedibr.connect4_team17.Activities.LoginActivity.LOGIN_STATUS_HANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
@@ -74,7 +74,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
                     // poll to get a current game
                     monitorMyGameState();
@@ -82,7 +82,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 } else {
 
                     // User is signed out
-                    Log.d(LOGIN_STATUS_HANGED_TAG, "onAuthStateChanged:signed_out");
+                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
 
                     // close the game room
                     finish();

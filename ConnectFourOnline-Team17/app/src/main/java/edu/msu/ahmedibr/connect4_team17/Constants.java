@@ -45,6 +45,18 @@ public class Constants {
     public static final String LAST_CHOSEN_CELL_JSON_KEY = "com.connectfour.last_chosen_cell.json.key";
     public static final String CHOSEN_CELL_JSON_KEY = "com.connectfour.chosen_cell.json.key";
 
+    /**
+     * Exception strings
+     */
+    public static final String WEAK_PASSWORD_EXCEPTION_FIREBASE = "WEAK_PASSWORD";
+    public static final String EMAIL_BADLY_FORMATTED_EXCEPTION_FIREBASE = "The email address is badly formatted.";
 
+    /**
+     * Logging tags
+     */
+    public static final String LOGIN_STATUS_CHANGED_TAG = "LOGIN_STATUS_CHANGED";
+    public static final String AUTH_FAILED_TAG = "AUTH_FAILED";
+    public static final String CREATE_ACCOUNT = "CREATE_ACCOUNT";
+    public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
 
 }
