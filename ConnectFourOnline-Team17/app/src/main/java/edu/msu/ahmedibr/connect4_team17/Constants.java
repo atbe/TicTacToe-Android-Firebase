@@ -58,5 +58,7 @@ public class Constants {
     public static final String AUTH_FAILED_TAG = "AUTH_FAILED";
     public static final String CREATE_ACCOUNT = "CREATE_ACCOUNT";
     public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
+    public static final String CONNECTIVITY_BROADCAST_TAG = "CONNECTIVITY_BROADCAST";
+
 
 }
