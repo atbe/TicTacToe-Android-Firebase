@@ -11,10 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import org.json.JSONObject;
-
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 
+import static edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourGame.PLAYER_ONE_ID;
+import static edu.msu.ahmedibr.connect4_team17.ConnectFour.ConnectFourGame.PLAYER_TWO_ID;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
@@ -35,11 +35,14 @@ public class ConnectFourView extends View {
     private TextView mCurrentPlayerNameTextView = null;
 
     /**
-     * The id of the winning player. 0 by default indicating no winner.
+     * The id of the winning player. null by default indicating no winner.
      */
-    private int winningPlayerId = 0;
+    private String winningPlayerUid = null;
 
     private String mMyPlayerUid;
+
+    private String mPlayerOneUid;
+    private String mPlayerTwoUid;
 
     /**
      * Used to check if the game has been won.
@@ -48,7 +51,17 @@ public class ConnectFourView extends View {
      * @return True if the game has a winner.
      */
     public boolean isGameWon() {
-        return winningPlayerId != 0;
+        winningPlayerUid = game.getWinningPlayerUid();
+        return winningPlayerUid != null;
+    }
+
+    /**
+     * Getter for the uid of the winning player.
+     *
+     * @return The uid of the player who won.
+     */
+    public String getWinningPlayerUid() {
+        return winningPlayerUid;
     }
 
     /**
@@ -57,7 +70,7 @@ public class ConnectFourView extends View {
      * @return The id of the player who won.
      */
     public int getWinningPlayerId() {
-        return winningPlayerId;
+        return winningPlayerUid.equals(mPlayerOneUid) ? PLAYER_ONE_ID : PLAYER_TWO_ID;
     }
 
     /**
@@ -93,13 +106,13 @@ public class ConnectFourView extends View {
 
         // the game activity should have had the names of the players passed to it.
         String playerOneName = parentBundle.getString(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY);
-        String playerOneUid = parentBundle.getString(PLAYER_ONE_UID_BUNDLE_KEY);
+        mPlayerOneUid = parentBundle.getString(PLAYER_ONE_UID_BUNDLE_KEY);
         String playerTwoName = parentBundle.getString(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY);
-        String playerTwoUid = parentBundle.getString(PLAYER_TWO_UID_BUNDLE_KEY);
+        mPlayerTwoUid = parentBundle.getString(PLAYER_TWO_UID_BUNDLE_KEY);
 
         mGameActivity = (GameActivity) getContext();
 
-        game = new ConnectFourGame(mGameActivity, playerOneName, playerOneUid, playerTwoName, playerTwoUid);
+        game = new ConnectFourGame(mGameActivity, playerOneName, mPlayerOneUid, playerTwoName, mPlayerTwoUid);
     }
 
     @Override
@@ -128,10 +141,8 @@ public class ConnectFourView extends View {
         // TODO: Check for win here so we can report it to the parent activity
         boolean nextPlayersTurn = game.beginNextPlayersTurn();
 
-        int winnerIdNumber = game.checkForWin();
-        if (winnerIdNumber != 0) {
-            winningPlayerId = winnerIdNumber;
-        }
+        // update winning player if there is one
+        winningPlayerUid = getWinningPlayerUid();
 
         setCurrentPlayerName();
         invalidate();
@@ -215,6 +226,11 @@ public class ConnectFourView extends View {
 
     public boolean isMyTurn() {
         return game.getCurrentPlayerUid().equals(mMyPlayerUid);
+    }
+
+    public void userSurrenders(String uid) {
+        game.userSurrenders(uid);
+        winningPlayerUid = game.getWinningPlayerUid();
     }
 }
 

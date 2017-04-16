@@ -27,9 +27,12 @@ import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
 import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
-import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_GAME_DUMP_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_STATE_JSON_DUMP_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.IS_WINNER_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 
 public class GameActivity extends FirebaseUserActivity {
@@ -52,6 +55,8 @@ public class GameActivity extends FirebaseUserActivity {
     String mLoserName = null;
 
     private String mCurrentGameKey;
+
+    private boolean mAmCreator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +84,7 @@ public class GameActivity extends FirebaseUserActivity {
 
         // get the game key and whether I'm creator from the bundle
         mCurrentGameKey = getIntent().getStringExtra(CURRENT_GAME_BUNDLE_KEY);
-        final boolean amCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
+        mAmCreator = getIntent().getBooleanExtra(AM_CREATOR_BUNDLE_KEY, false);
 
         // set the GameView and set the current player textview
         mConnectFourView = (ConnectFourView)findViewById(R.id.connectFourView);
@@ -97,14 +102,22 @@ public class GameActivity extends FirebaseUserActivity {
                         Log.d("GameStateChange", "The game state has changed.");
                         makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
 
+                        // this is the case in which the current player is the creator and the game is
+                        // yet to be created
                         if (dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class) == DatabaseModels.Game.State.JOINED.ordinal()
-                                && amCreator) {
+                                && mAmCreator) {
                             // will run in transaction
                             initializeFirebaseGame();
                             Log.d("GameStateChange", "Initializing game");
                         } else {
-                            loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
+                            loadGameFromJson(dataSnapshot.child(GAME_STATE_JSON_DUMP_KEY).getValue(String.class));
                             mConnectFourView.invalidate();
+                        }
+
+                        // in-progress game, let's make sure the game has not ended
+                        if (mConnectFourView.isGameWon()) {
+                            sendFirebaseWinningState();
+                            mGamesDatabaseRef.removeEventListener(this);
                         }
                     }
 
@@ -119,34 +132,19 @@ public class GameActivity extends FirebaseUserActivity {
             mConnectFourView.getFromBundle(savedInstanceState);
             // TODO: If activity needs to restore anything.
         }
+    }
 
-//        mGamesDatabaseRef.child(mCurrentGameKey)
-//                .addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        if (!dataSnapshot.child(GAME_GAME_DUMP_KEY).exists()) {
-//                            dataSnapshot.getRef().runTransaction(new Transaction.Handler() {
-//                                @Override
-//                                public Transaction.Result doTransaction(MutableData mutableData) {
-//                                    initializeFirebaseGame();
-//                                    return Transaction.success(mutableData);
-//                                }
-//
-//                                @Override
-//                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-//                                }
-//                            });
-//
-//                            return;
-//                        }
-//
-//                        Log.d("CheckInitialGameState", "Resuming already started game.");
-//                        loadGameFromJson(dataSnapshot.child(GAME_GAME_DUMP_KEY).getValue(String.class));
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {}
-//                });
+    private boolean didIWin() {
+        return mConnectFourView.getWinningPlayerUid().equals(mAuth.getCurrentUser().getUid());
+    }
+
+    /**
+     * Each user will need to see the result of the game so they are sent here to get their status
+     * updated then sent to the winner activity.
+     */
+    private void handleGameEnded() {
+        setWinnerAndLoserNames(mConnectFourView.getWinningPlayerId());
+        moveToWinnerActivity();
     }
 
     /**
@@ -162,7 +160,7 @@ public class GameActivity extends FirebaseUserActivity {
                 // dump the game to json string so we can push it to the database
                 String jsonString = gameToJsonString();
                 mutableData.child(mCurrentGameKey)
-                        .child(GAME_GAME_DUMP_KEY)
+                        .child(GAME_STATE_JSON_DUMP_KEY)
                         .setValue(jsonString);
                 // now the game hsa been started
                 mutableData.child(mCurrentGameKey)
@@ -236,13 +234,8 @@ public class GameActivity extends FirebaseUserActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Surrender the game and go to Winner screen
-                        int winningPlayerId = mConnectFourView.getCurrentPlayerId() == ConnectFourGame.PLAYER_ONE_ID ?
-                                ConnectFourGame.PLAYER_TWO_ID : ConnectFourGame.PLAYER_ONE_ID;
-
-                        // TODO: Update game state and winner/loser here
-
-                        setWinnerAndLoserNames(winningPlayerId);
-                        moveToWinnerActivity();
+                        mConnectFourView.userSurrenders(mAuth.getCurrentUser().getUid());
+                        sendFirebaseWinningState();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -252,6 +245,31 @@ public class GameActivity extends FirebaseUserActivity {
                     }
                 })
                 .show();
+    }
+
+    /**
+     * Called if the current user has either won or lost the current game.
+     */
+    void sendFirebaseWinningState() {
+        // get our users tree key for the database, either joiner or creator
+        final String position = mAmCreator ? CREATOR_DATA_KEY : JOINER_DATA_KEY;
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        mutableData.child(position)
+                                .child(IS_WINNER_KEY)
+                                .setValue(didIWin());
+                        mutableData.child(GAME_STATE_JSON_DUMP_KEY)
+                                .setValue(gameToJsonString());
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        handleGameEnded();
+                    }
+                });
     }
 
     /**
@@ -266,14 +284,12 @@ public class GameActivity extends FirebaseUserActivity {
         }
 
         if (!mConnectFourView.onMoveDone()) {
-            // to not update state as the move has not actually changed
+            // do not update state as the move has not actually changed
             return;
         }
 
         if (mConnectFourView.isGameWon()) {
-           setWinnerAndLoserNames(mConnectFourView.getWinningPlayerId());
-           moveToWinnerActivity();
-
+            sendFirebaseWinningState();
             // TODO: CHange game state in database
             // TODO: Send names to winning activity
         }
@@ -283,11 +299,12 @@ public class GameActivity extends FirebaseUserActivity {
             // TODO: Send names to winning activity
         }
 
+        // write out the new game state to the server in a transaction
         mGamesDatabaseRef.child(mCurrentGameKey)
                 .runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
-                        mutableData.child(GAME_GAME_DUMP_KEY)
+                        mutableData.child(GAME_STATE_JSON_DUMP_KEY)
                                 .setValue(gameToJsonString());
                         return Transaction.success(mutableData);
                     }

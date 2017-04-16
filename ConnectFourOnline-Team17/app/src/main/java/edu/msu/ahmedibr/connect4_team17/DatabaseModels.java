@@ -1,5 +1,7 @@
 package edu.msu.ahmedibr.connect4_team17;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 /**
  * Created by abe on 4/9/17.
  */
@@ -8,9 +10,10 @@ public class DatabaseModels {
     /**
      * Used to mode a game pool object
      */
+    @IgnoreExtraProperties
     public static class Game {
 
-        public enum State {OPEN, JOINED, STARTED}
+        public enum State {OPEN, JOINED, STARTED, ENDED}
 
         private int mState;
 
@@ -53,32 +56,42 @@ public class DatabaseModels {
     /**
      * Used to model a user in a game (in the eyes of the database)
      */
+    @IgnoreExtraProperties
     public static class User {
-        private String mDisplayName;
-        private String mId;
+        private String displayName;
+        private String id;
+        /**
+         * When isWinner is null, either the game has not ended or the user is yet to hear of the win.
+         */
+        private Boolean isWinner = null;
 
         public String getDisplayName() {
-            return mDisplayName;
+            return displayName;
         }
 
         public void setDisplayName(String mDisplayName) {
-            this.mDisplayName = mDisplayName;
+            this.displayName = mDisplayName;
         }
 
         public String getId() {
-            return mId;
+            return id;
         }
 
         public void setId(String mId) {
-            this.mId = mId;
+            this.id = mId;
         }
+
+        public Boolean getIsWinner() { return isWinner; }
+
+        public void setIsWinner(Boolean flag) { isWinner = flag; }
 
         public User() {
         }
 
-        public User(String displayName, String id) {
-            mDisplayName = displayName;
-            mId = id;
+        public User(String displayName, String id, Boolean isWinner) {
+            this.displayName = displayName;
+            this.id = id;
+            this.isWinner = isWinner;
         }
     }
 }
