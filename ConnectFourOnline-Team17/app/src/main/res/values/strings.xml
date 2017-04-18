@@ -6,6 +6,7 @@
     <string name="instructions">Instructions</string>
     <string name="loser_text">Sorry, you lost.</string>
     <string name="tied">Tie Game!</string>
+    <string name="game_room_subheader">Tap on a game to join.</string>
 
     <!--Hints-->
     <string name="username_hint">Username</string>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/game_waitroom_activity_coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.msu.ahmedibr.connect4_team17.Activities.GameRoomActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/createGameRoomActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:onClick="onCreateGame"
+            app:fabSize="auto"
+            app:srcCompat="@drawable/ic_add_black_36dp" />
+
+        <TextView
+            android:id="@+id/openGamesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Open Games"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/clickToJoinGameHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/openGamesTitle"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="5dp"
+            android:text="@string/game_room_subheader"
+            android:textSize="15sp" />
+
+        <ListView
+            android:id="@+id/gameList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/clickToJoinGameHint" />
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>
