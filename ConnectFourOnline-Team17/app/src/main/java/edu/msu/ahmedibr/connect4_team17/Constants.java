@@ -11,6 +11,7 @@ public class Constants {
      */
     // root nodes (tables)
     public static final String GAMES_DATABASE_ROOT_KEY = "games";
+    public static final String ARCHIVED_DATABASE_ROOT_KEY = "archived_games";
 
     // user root nodes (creator or joiner) for two player game
     public static final String CREATOR_DATA_KEY = "creator";

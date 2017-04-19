@@ -200,14 +200,20 @@ public class GameRoomActivity extends FirebaseUserActivity {
                             mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
                                 @Override
                                 public Transaction.Result doTransaction(MutableData mutableData) {
-                                    mGamesDatabaseRef.push().setValue(game);
+                                    // safety against callbacks while activity is shutting down
+                                    if (mCurrentGame == null) {
+                                        mGamesDatabaseRef.push().setValue(game);
+                                    } else {
+                                        return Transaction.abort();
+                                    }
                                     return Transaction.success(mutableData);
                                 }
 
                                 @Override
-                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                    mCurrentGame = game;
+                                }
                             });
-                            return;
                         } else {
                             makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
                         }

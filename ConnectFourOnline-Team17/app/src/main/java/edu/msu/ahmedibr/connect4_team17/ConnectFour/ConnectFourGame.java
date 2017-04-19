@@ -336,6 +336,9 @@ public class ConnectFourGame {
     public String getWinningPlayerUid() {
         if (mWinningPlayerUid == null) {
             mWinningPlayerUid = checkForWin();
+            if (isThereATie()) {
+                mWinningPlayerUid = "TIE";
+            }
         }
         return mWinningPlayerUid;
     }
