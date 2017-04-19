@@ -161,7 +161,12 @@ public class GameActivity extends FirebaseUserActivity {
      */
     private void handleGameEndActivity() {
         setWinnerAndLoserNames(mConnectFourView.getWinningPlayerId());
-        moveToWinnerActivity();
+
+        if (mConnectFourView.isThereATie()) {
+            moveToWinnerActivityWithTie();
+        } else {
+            moveToWinnerActivity();
+        }
     }
 
     /**
@@ -265,7 +270,10 @@ public class GameActivity extends FirebaseUserActivity {
     }
 
     /**
-     * Called if the current user has either won or lost the current game.
+     * This method will send the current players win state to the server. It will write whether this
+     * current user won the game or not. Once the write to the database is finished it fires the winner
+     * game activity to show the players the results and then begins to update the state of the game
+     * to ended. Once the state updating finishes a call to finish() is made to kill the activity.
      */
     void sendFirebaseWinningState() {
         // get our users tree key for the database, either joiner or creator
@@ -314,6 +322,13 @@ public class GameActivity extends FirebaseUserActivity {
         });
     }
 
+    /**
+     * This function will write the new state of the game (ENDED) to the database.
+     *
+     * There are two cases when this function is called, either the other player has already been
+     * made aware that the game has ended or they have not. If they have been notified, it is safe
+     * to archive the game.
+     */
     private void handleGameEnd() {
         final String otherPlayerPosition = mAmCreator ? JOINER_DATA_KEY : CREATOR_DATA_KEY;
         mGamesDatabaseRef.child(mCurrentGameKey)
@@ -346,6 +361,12 @@ public class GameActivity extends FirebaseUserActivity {
                 });
     }
 
+    /**
+     * This function handles the archiving of the game. It moves the game from the games tree to the
+     * archived_games tree in the database. This will only happen if both players are aware that
+     * the game has ended so that we can prevent a player who is not in the app from missing the
+     * results of the game.
+     */
     private void handleGameEndArchive() {
         final String otherPlayerPosition = mAmCreator ? JOINER_DATA_KEY : CREATOR_DATA_KEY;
         mGamesDatabaseRef.child(mCurrentGameKey).addListenerForSingleValueEvent(new ValueEventListener() {
