@@ -62,15 +62,6 @@
                     android:textSize="20sp" />
             </android.support.design.widget.TextInputLayout>
 
-            <CheckBox
-                android:id="@+id/rememberLogIn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/PasswordLayout"
-                android:layout_marginTop="15dp"
-                android:text="@string/rememberLogIn" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

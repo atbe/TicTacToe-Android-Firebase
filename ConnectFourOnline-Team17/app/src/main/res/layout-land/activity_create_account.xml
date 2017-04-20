@@ -78,15 +78,6 @@
                         android:textSize="20sp" />
                 </android.support.design.widget.TextInputLayout>
 
-                <CheckBox
-                    android:id="@+id/rememberLogIn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/rememberLogIn"
-                    android:layout_below="@+id/password_verify_layout"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true" />
-
                 <Button
                     android:id="@+id/create_account_button"
                     android:layout_width="wrap_content"

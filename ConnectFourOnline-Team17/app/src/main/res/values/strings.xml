@@ -45,7 +45,6 @@
     <string name="sign_out_menu_button">Sign Out</string>
 
     <!--Checkboxes-->
-    <string name="rememberLogIn">Keep me signed in</string>
     <string name="done_btn">Done</string>
     <string name="surrender_btn">Surrender</string>
     <string name="undo_btn">Undo</string>
