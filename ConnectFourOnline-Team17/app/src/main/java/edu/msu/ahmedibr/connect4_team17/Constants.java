@@ -63,5 +63,9 @@ public class Constants {
     public static final String AUTH_STATUS_TAG = "AUTH_STATUS";
     public static final String CONNECTIVITY_BROADCAST_TAG = "CONNECTIVITY_BROADCAST";
 
+    /**
+     * Messages
+     */
+    public static final String JOINING_GAME_MESSAGE = "Joining the game...";
 
 }

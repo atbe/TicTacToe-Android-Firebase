@@ -31,6 +31,7 @@ import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.JOINING_GAME_MESSAGE;
 import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
@@ -74,7 +75,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+//                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
                     // poll to get a current game
                     monitorMyGameState();
@@ -82,7 +83,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 } else {
 
                     // User is signed out
-                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
+//                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
 
                     // close the game room
                     finish();
@@ -120,7 +121,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 DatabaseModels.Game game = (DatabaseModels.Game) adapterView.getItemAtPosition(position);
-                makeSnack(String.format("You pressed game from creator '%s'", game.getCreator()), Snackbar.LENGTH_LONG);
+                makeSnack(JOINING_GAME_MESSAGE, Snackbar.LENGTH_INDEFINITE);
 
                 joinGame(game, mOpenGamesAdapter.getRef(position).getKey());
 
@@ -184,13 +185,13 @@ public class GameRoomActivity extends FirebaseUserActivity {
         final String username = mAuth.getCurrentUser().getDisplayName();
         final String uid = mAuth.getCurrentUser().getUid();
         final DatabaseModels.Game game = new DatabaseModels.Game(new DatabaseModels.User(username, uid, null));
-        Log.d("CreateGame", String.format("Creating game for user '%s'", username));
+//        Log.d("CreateGame", String.format("Creating game for user '%s'", username));
 
         // check if there is already a game this user created
         // match by creator/id
         mGamesDatabaseRef.orderByChild(CREATOR_DATA_KEY.concat("/").concat(USER_ID_KEY))
                 .equalTo(uid) // equal to the current users id
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // TODO: if someone joins the game we need to jump to game activity
@@ -248,7 +249,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
                             setAmGameCreator(true);
 
-//                            makeSnack("You're in a game you created", Snackbar.LENGTH_LONG);
                             if (shouldGameBegin()) {
                                 mGamesDatabaseRef.removeEventListener(this);
                                 beginGameActivity();
@@ -336,9 +336,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
                 mutableData.child(gameId).child(JOINER_DATA_KEY).setValue(joiningUser);
-
-                // TODO: Assuming the game has not been joined by the time the touch event was processed, will need
-                // to check state before modifying.
 
                 mutableData.child(gameId).child(GAME_POOL_STATE_KEY).setValue(DatabaseModels.Game.State.JOINED.ordinal());
                 return Transaction.success(mutableData);
