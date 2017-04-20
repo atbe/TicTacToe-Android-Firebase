@@ -76,9 +76,9 @@
 
         <Button android:id="@+id/create_account_button"
             android:padding="20dp"
-            android:layout_alignParentBottom="true"
             android:text="@string/create_account"
             android:onClick="onCreateAccount"
+            android:layout_below="@id/password_verify_layout"
             android:textSize="18sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
