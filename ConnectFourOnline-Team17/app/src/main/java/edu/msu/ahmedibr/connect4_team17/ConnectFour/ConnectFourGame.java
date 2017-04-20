@@ -1,6 +1,7 @@
 package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -121,6 +122,9 @@ public class ConnectFourGame {
      */
     private String mWinningPlayerUid = null;
 
+    transient public Bitmap mPlayerOneDiskImage;
+    transient public Bitmap mPlayerTwoDiskImage;
+
     /**
      * Getter for the current players name.
      *
@@ -167,9 +171,9 @@ public class ConnectFourGame {
         // create the players
         // TODO: Player one always green disk?
         mPlayerOne = new ConnectFourPlayer(playerOneName, R.drawable.spartan_green_player_one,
-                PLAYER_ONE_ID, playerOneUid);
+                PLAYER_ONE_ID, playerOneUid, context);
         mPlayerTwo = new ConnectFourPlayer(playerTwoName, R.drawable.spartan_white_player_two,
-                PLAYER_TWO_ID, playerTwoUid);
+                PLAYER_TWO_ID, playerTwoUid, context);
 
         mParentActivityContext = context;
 
@@ -514,7 +518,7 @@ public class ConnectFourGame {
      *
      * @return true for a full board resulting in a tie, and false if the board isn't full
      */
-    public boolean isThereATie(){
+    public boolean isThereATie() {
         // Loop through every tile and see if it's owned by a player or not
         for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
             // If the top of a column is not owned, the board is not full
