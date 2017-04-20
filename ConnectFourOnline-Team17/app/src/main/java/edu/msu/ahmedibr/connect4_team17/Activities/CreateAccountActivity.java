@@ -80,7 +80,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+//                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
                             .setDisplayName(mUsername).build();
                     user.updateProfile(profileChangeRequest);
@@ -92,8 +92,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                 } else {
                     // User is signed out
                     Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
-                    // TODO: Add actions to remove user data from preferences close game, and return
-                    // to login screen.
                 }
             }
         };

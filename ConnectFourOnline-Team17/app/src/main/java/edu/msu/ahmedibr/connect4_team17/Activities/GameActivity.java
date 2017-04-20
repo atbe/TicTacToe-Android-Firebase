@@ -106,8 +106,8 @@ public class GameActivity extends FirebaseUserActivity {
 
                         // TODO: Other player made a change to game state,
                         // load it
-                        Log.d("GameStateChange", "The game state has changed.");
-                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
+//                        Log.d("GameStateChange", "The game state has changed.");
+//                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
 
                         // this can be null if the game activity is still listening for events but
                         // the game ended (activity still being killed)
@@ -122,7 +122,7 @@ public class GameActivity extends FirebaseUserActivity {
                                 && mAmCreator) {
                             // will run in transaction
                             initializeFirebaseGame();
-                            Log.d("GameStateChange", "Initializing game");
+//                            Log.d("GameStateChange", "Initializing game");
                         } else {
                             String jsonData = dataSnapshot.child(GAME_STATE_JSON_DUMP_KEY).getValue(String.class);
                             if (jsonData != null) {
@@ -288,6 +288,15 @@ public class GameActivity extends FirebaseUserActivity {
                     return;
                 }
 
+                // don't update the state if the game is over
+                Integer gameState = dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class);
+                if (gameState == null) {
+                    return;
+                }
+                if (gameState.equals(DatabaseModels.Game.State.ENDED.ordinal())) {
+                    return;
+                }
+
                 mGamesDatabaseRef.child(mCurrentGameKey)
                 .runTransaction(new Transaction.Handler() {
                     @Override
@@ -341,6 +350,11 @@ public class GameActivity extends FirebaseUserActivity {
                         // if the other player has not seen the game result, do not mark game as ended
                         if (!dataSnapshotGamesDb.exists()) {
                             mGamesDatabaseRef.removeEventListener(this);
+                            return;
+                        }
+
+                        // don't update the state if the other game has not seen the results
+                        if (!dataSnapshotGamesDb.child(otherPlayerPosition).child(IS_WINNER_KEY).exists()) {
                             return;
                         }
 

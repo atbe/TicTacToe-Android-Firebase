@@ -319,7 +319,7 @@ public class ConnectFourGame {
         if (mGridColumns.get(colNumber).get(0).isOwnedByPlayer()) {
             Snackbar.make(mParentActivityContext.findViewById(R.id.game_activity_coordinator_layout),
                     mParentActivityContext.getResources().getText(R.string.column_full), Snackbar.LENGTH_LONG).show();
-            Log.d("ConnectFourGame", "Player chose a column that is full!");
+//            Log.d("ConnectFourGame", "Player chose a column that is full!");
             return;
         }
 

@@ -38,7 +38,7 @@
     <string name="login_succeeded">Login succeeded!</string>
     <string name="email_address_invalid">This email address is already in use. Please try a different email address.</string>
     <string name="already_created_game">You already have an open game created!</string>
-    <string name="cannot_join_your_own_game">You\'re already in the game you created. You can join a different game if you want!</string>
+    <string name="cannot_join_your_own_game">You can\'t join your own game!</string>
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
