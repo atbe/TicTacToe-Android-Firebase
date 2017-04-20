@@ -183,7 +183,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
     public void onCreateGame(View view) {
         final String username = mAuth.getCurrentUser().getDisplayName();
         final String uid = mAuth.getCurrentUser().getUid();
-        final DatabaseModels.Game game = new DatabaseModels.Game(new DatabaseModels.User(username, uid));
+        final DatabaseModels.Game game = new DatabaseModels.Game(new DatabaseModels.User(username, uid, null));
         Log.d("CreateGame", String.format("Creating game for user '%s'", username));
 
         // check if there is already a game this user created
@@ -200,32 +200,22 @@ public class GameRoomActivity extends FirebaseUserActivity {
                             mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
                                 @Override
                                 public Transaction.Result doTransaction(MutableData mutableData) {
-                                    mGamesDatabaseRef.push().setValue(game);
+                                    // safety against callbacks while activity is shutting down
+                                    if (mCurrentGame == null) {
+                                        mGamesDatabaseRef.push().setValue(game);
+                                    } else {
+                                        return Transaction.abort();
+                                    }
                                     return Transaction.success(mutableData);
                                 }
 
                                 @Override
-                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {}
+                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                    mCurrentGame = game;
+                                }
                             });
-                            return;
                         } else {
                             makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
-//                            dataSnapshot.getRef().getParent().child(JOINER_DATA_KEY).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot dataSnapshot) {
-//                                    if (dataSnapshot.exists()) {
-//                                        setCurrentGame(dataSnapshot.getValue(DatabaseModels.Game.class));
-//                                        shouldGameBegin();
-//                                        finish();
-//                                    }
-//
-//                                    makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {}
-//                            });
-//                        }
                         }
                     }
 
@@ -304,7 +294,8 @@ public class GameRoomActivity extends FirebaseUserActivity {
     }
 
     /**
-     * Checks if the game should begin on this device depending on the state.
+     * Checks if the game should begin on this device depending on the state. The user could already
+     * have finished the game but the state is still STARTED until both players see the game result.
      */
     private boolean shouldGameBegin() {
         if (mCurrentGame == null) {
@@ -315,8 +306,12 @@ public class GameRoomActivity extends FirebaseUserActivity {
         if (mCurrentGame.getState() == DatabaseModels.Game.State.JOINED.ordinal() && mAmGameCreator) {
             return true;
         } else if (mCurrentGame.getState() == DatabaseModels.Game.State.STARTED.ordinal()) {
-            //if the game has started, proceed
-            return true;
+            // if the game has started, make sure we haven't already finished
+            if (mAmGameCreator) {
+                return mCurrentGame.getCreator().getIsWinner() == null;
+            } else {
+                return mCurrentGame.getJoiner().getIsWinner() == null;
+            }
         }
 
         return false;
@@ -335,7 +330,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
         }
 
         // The joining user needs to be added to the database entry for the game
-        final DatabaseModels.User joiningUser = new DatabaseModels.User(mAuth.getCurrentUser().getDisplayName(), mAuth.getCurrentUser().getUid());
+        final DatabaseModels.User joiningUser = new DatabaseModels.User(mAuth.getCurrentUser().getDisplayName(), mAuth.getCurrentUser().getUid(), null);
         // TODO: if there is currently an open game and I am the creator, remove it
         mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
             @Override

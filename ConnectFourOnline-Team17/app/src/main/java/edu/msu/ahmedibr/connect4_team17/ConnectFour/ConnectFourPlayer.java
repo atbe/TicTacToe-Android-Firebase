@@ -4,6 +4,11 @@ package edu.msu.ahmedibr.connect4_team17.ConnectFour;
  * Created by abe on 3/5/17.
  */
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
 /**
  * Class used to model a player in the game
  */
@@ -24,7 +29,6 @@ public class ConnectFourPlayer {
     /**
      * Resource id of the disk belonging to the player.
      */
-    // TODO: Should I make this transient? Need to find out if resource ids change when activity is killed
     private int mDiskImageResourceId;
 
     public int getDiskImageResourceId() {
@@ -49,7 +53,7 @@ public class ConnectFourPlayer {
      * @param diskImageResourceId The resourceid of the disk used for this player.
      * @param playerId The unique id of the player.
      */
-    public ConnectFourPlayer(String mName, int diskImageResourceId, int playerId, String uid) {
+    public ConnectFourPlayer(String mName, int diskImageResourceId, int playerId, String uid, Context context) {
         this.mName = mName;
         this.mDiskImageResourceId = diskImageResourceId;
         this.mPlayerId = playerId;
