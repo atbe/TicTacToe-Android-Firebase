@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 import edu.msu.ahmedibr.connect4_team17.R;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.ALREADY_JOINED_CANT_CREATE_GAME;
 import static edu.msu.ahmedibr.connect4_team17.Constants.AM_CREATOR_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CREATOR_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY;
@@ -38,6 +39,7 @@ import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_K
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_UID_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.USER_ID_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.WAITING_FOR_CREATOR_MESSAGE;
 
 public class GameRoomActivity extends FirebaseUserActivity {
 
@@ -194,8 +196,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // TODO: if someone joins the game we need to jump to game activity
-
                         // If the user does not already have a created game, allow them to create the game.
                         if (!dataSnapshot.exists()) {
                             mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
@@ -205,6 +205,11 @@ public class GameRoomActivity extends FirebaseUserActivity {
                                     if (mCurrentGame == null) {
                                         mGamesDatabaseRef.push().setValue(game);
                                     } else {
+                                        // if the current user already joined a game and is waiting for the creator
+                                        if (mCurrentGame.getCreator() != null) {
+                                            makeSnack(String.format(ALREADY_JOINED_CANT_CREATE_GAME,
+                                                    mCurrentGame.getCreator().getDisplayName()), Snackbar.LENGTH_INDEFINITE);
+                                        }
                                         return Transaction.abort();
                                     }
                                     return Transaction.success(mutableData);
@@ -300,6 +305,15 @@ public class GameRoomActivity extends FirebaseUserActivity {
     private boolean shouldGameBegin() {
         if (mCurrentGame == null) {
             return false;
+        }
+
+        if (mCurrentGame.getState() == DatabaseModels.Game.State.JOINED.ordinal() && !mAmGameCreator) {
+            // TODO: In the future it would be stupid to not allow the player to leave the game in-case
+            // the creator never returns to the app.
+            if (mCurrentGame.getCreator() != null) {
+                makeSnack(String.format(WAITING_FOR_CREATOR_MESSAGE,
+                        mCurrentGame.getCreator().getDisplayName()), Snackbar.LENGTH_INDEFINITE);
+            }
         }
 
         // if the game has been JOINED AND you are the creator, start the game

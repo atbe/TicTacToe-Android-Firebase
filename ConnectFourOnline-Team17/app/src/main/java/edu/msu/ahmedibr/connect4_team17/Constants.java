@@ -67,5 +67,6 @@ public class Constants {
      * Messages
      */
     public static final String JOINING_GAME_MESSAGE = "Joining the game...";
-
+    public static final String WAITING_FOR_CREATOR_MESSAGE = "Joined successfully, waiting for %s to start the game.";
+    public static final String ALREADY_JOINED_CANT_CREATE_GAME = "You've already joined a game, we're waiting for %s to start the game.";
 }
