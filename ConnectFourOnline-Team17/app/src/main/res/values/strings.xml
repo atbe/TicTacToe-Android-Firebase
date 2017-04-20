@@ -1,12 +1,11 @@
 <resources>
     <!--Prompts-->
-    <string name="player_one_name_prompt">Player 1 Name</string>
-    <string name="player_two_name_prompt">Player 2 Name</string>
     <string name="new_game">Find another Game</string>
     <string name="instructions">Instructions</string>
     <string name="loser_text">Sorry, you lost.</string>
     <string name="tied">Tie Game!</string>
     <string name="game_room_subheader">Tap on a game to join.</string>
+    <string name="open_game">Open Games</string>
 
     <!--Hints-->
     <string name="username_hint">Username</string>
@@ -16,13 +15,10 @@
     <!--Titles-->
     <string name="app_name">Connect 4 - Team 17</string>
     <string name="main_lets_play_title">Let\'s Play Connect 4!</string>
-    <string name="username">Username</string>
-    <string name="password">Password</string>
     <string name="create_account_title">Create Account</string>
 
     <!--Alerts-->
     <string name="winner_text">You Won!</string>
-    <string name="names_empty">Player names cannot be empty!</string>
     <string name="already_made_move">You already placed a disk!</string>
     <string name="no_move_played">You must make a move before ending your turn!</string>
     <string name="column_full">That column is full! You cannot place a disk there.</string>
@@ -42,7 +38,6 @@
 
     <!--Buttons-->
     <string name="login_btn">Login</string>
-    <string name="start_game_button">Start Game</string>
     <string name="sign_out_menu_button">Sign Out</string>
 
     <!--Checkboxes-->
@@ -59,6 +54,5 @@
     <string name="name_of_winner">INSERT WINNER</string>
     <string name="sampletext">SAMPLE TEXT</string>
     <string name="create_account">Create Account</string>
-    <string name="title_activity_create_account">CreateAccountActivity</string>
 
 </resources>

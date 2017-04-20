@@ -1,6 +1,5 @@
 package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -12,9 +11,6 @@ import android.view.View;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -424,7 +420,7 @@ public class ConnectFourGame {
     }
 
     // Key constants used to store the state into a bundle
-    public static final String CURRENT_PLAYER_SAVED_INSTACE_KEY = "com.connect4.team17.lastplayer.savedinstance";
+    public static final String CURRENT_PLAYER_SAVED_INSTANCE_KEY = "com.connect4.team17.lastplayer.savedinstance";
     public static final String OWNERSHIP_GRID_SAVED_INSTANCE_KEY = "com.connect4.team17.playertwo.savedinstance";
     public static final String LAST_MOVE_POSITION_ROW_INSTANCE_KEY = "com.connect4_team17.lastmoverow.savedinstace";
     public static final String LAST_MOVE_POSITION_COLUMN_INSTANCE_KEY = "com.connect4_team17.lastmovecolumn.savedinstace";
@@ -454,7 +450,7 @@ public class ConnectFourGame {
     public void getFromBundle(Bundle savedInstanceState) {
 
         // set the current player
-        mCurrentPlayer = savedInstanceState.getInt(CURRENT_PLAYER_SAVED_INSTACE_KEY)
+        mCurrentPlayer = savedInstanceState.getInt(CURRENT_PLAYER_SAVED_INSTANCE_KEY)
                 == PLAYER_ONE_ID ? mPlayerOne : mPlayerTwo;
 
         loadOwnershipGrid((ArrayList<ArrayList<Integer>>)
@@ -499,7 +495,7 @@ public class ConnectFourGame {
     public void putToBundle(Bundle outState) {
         outState.putSerializable(OWNERSHIP_GRID_SAVED_INSTANCE_KEY, buildOwnerShipGrid());
 
-        outState.putSerializable(CURRENT_PLAYER_SAVED_INSTACE_KEY, mCurrentPlayer.getPlayerId());
+        outState.putSerializable(CURRENT_PLAYER_SAVED_INSTANCE_KEY, mCurrentPlayer.getPlayerId());
 
         if (mLastChosenCell != null) {
             outState.putInt(LAST_MOVE_POSITION_COLUMN_INSTANCE_KEY, mLastChosenCell.getColumn());

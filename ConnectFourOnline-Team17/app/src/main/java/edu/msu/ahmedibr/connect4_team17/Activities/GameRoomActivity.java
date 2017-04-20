@@ -97,7 +97,7 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 android.R.layout.simple_list_item_1, mGamesDatabaseRef.orderByChild(GAME_POOL_STATE_KEY).equalTo(0)) {
             @Override
             protected void populateView(View view, DatabaseModels.Game game, int position) {
-                // fills in the list of games with the users name (thats all for now)
+                // fills in the list of games with the users name (that's all for now)
                 Log.d("PopulatingGameList", String.format("Incoming game from creator '%s' with state '%d'", game.getCreator(), game.getState()));
                 if (game.getCreator().getId().equals(mAuth.getCurrentUser().getUid())) {
                     ((TextView)view.findViewById(android.R.id.text1))
