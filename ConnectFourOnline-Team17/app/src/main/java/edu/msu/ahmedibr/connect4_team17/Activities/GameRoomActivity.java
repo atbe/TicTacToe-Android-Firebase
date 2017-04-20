@@ -144,25 +144,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
         mOpenGameList = (ListView) findViewById(R.id.gameList);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.game_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.menu_sign_out:
-                FirebaseAuth.getInstance().signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     private void makeSnack(int stringId, int length) {
         Snackbar.make(
                 findViewById(R.id.game_waitroom_activity_coordinator_layout),

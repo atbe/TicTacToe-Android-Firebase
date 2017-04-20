@@ -1,20 +1,22 @@
 package edu.msu.ahmedibr.connect4_team17.Activities;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import edu.msu.ahmedibr.connect4_team17.R;
 
-public class WinnerActivity extends AppCompatActivity {
+public class WinnerActivity extends FirebaseUserActivity {
     public static final String WINNING_PLAYER_NAME_BUNDLE_KEY = "com.cse476.team17.winning_player_name";
     public static final String LOSING_PLAYER_NAME_BUNDLE_KEY = "com.cse476.team17.losing_player_name";
 
     public static final String TIE_GAME_BUNDLE_KEY = "com.cse476.team17.tie_game";
-    public static final String PLAYER_ONE_NAME_ON_TIE_BUNDLE_KEY = "com.cse476.team17.player_one_tie";
-    public static final String PLAYER_TWO_NAME_ON_TIE_BUNDLE_KEY = "com.cse476.team17.player_two_tie";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,21 @@ public class WinnerActivity extends AppCompatActivity {
         } else {
             throw new RuntimeException("WinnerActivity did not receive a valid bundle!");
         }
+
+        setAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+//                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+
+                } else {
+//                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
+                    // close the game room
+                    finish();
+                }
+            }
+        });
     }
 
     /**

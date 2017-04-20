@@ -13,12 +13,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
+import edu.msu.ahmedibr.connect4_team17.R;
 
 import static edu.msu.ahmedibr.connect4_team17.Constants.ARCHIVED_DATABASE_ROOT_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CONNECTIVITY_BROADCAST_TAG;
@@ -161,4 +165,25 @@ public class FirebaseUserActivity extends AppCompatActivity {
     public void setAuthStateListener(FirebaseAuth.AuthStateListener listner) {
         mAuthListener = listner;
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.game_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_sign_out:
+                FirebaseAuth.getInstance().signOut();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }
