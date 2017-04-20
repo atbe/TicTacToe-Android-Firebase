@@ -17,7 +17,7 @@ Responsibility: Login and Create Account Layouts, reviewing pull requests, inspi
 
 Member 2: Ibrahim Ahmed
 
-Responsibility: Setup Firebase project, handled authentication implementation and GameRoomActivity.
+Responsibility: Setup Firebase project, handled authentication implementation and GameRoomActivity. Handled the client and server side interactions with the database.
 
 
 
