@@ -32,7 +32,6 @@ import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_GAME_BUNDLE_KEY
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAME_POOL_STATE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.JOINER_DATA_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.JOINING_GAME_MESSAGE;
-import static edu.msu.ahmedibr.connect4_team17.Constants.LOGIN_STATUS_CHANGED_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_UID_BUNDLE_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY;
@@ -53,6 +52,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
 
     private boolean mAmGameCreator = false;
 
+    ValueEventListener mCreatedGamesListener;
+    ValueEventListener mJoinedGamesListener;
+
     private void setAmGameCreator(boolean f) {
         mAmGameCreator = f;
     }
@@ -60,6 +62,10 @@ public class GameRoomActivity extends FirebaseUserActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        // re-subscribe the listeners
+        mGamesDatabaseRef.addValueEventListener(mCreatedGamesListener);
+        mGamesDatabaseRef.addValueEventListener(mJoinedGamesListener);
     }
 
     @Override
@@ -92,6 +98,8 @@ public class GameRoomActivity extends FirebaseUserActivity {
         });
 
         initViews();
+
+        createDatabaseListeners();
 
         // This is the adapter for the list of open games
         mOpenGamesAdapter = new FirebaseListAdapter<DatabaseModels.Game>(this, DatabaseModels.Game.class,
@@ -130,6 +138,65 @@ public class GameRoomActivity extends FirebaseUserActivity {
         });
     }
 
+    /**
+     * Initializes the event listeners for the database.
+     */
+    private void createDatabaseListeners() {
+        mCreatedGamesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    return;
+                }
+                // should only be in one game as the creator
+                assert 1 == dataSnapshot.getChildrenCount();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
+                    mCurrentGameKey = snapshot.getKey();
+
+                    setAmGameCreator(true);
+
+                    if (shouldGameBegin()) {
+                        mGamesDatabaseRef.removeEventListener(this);
+                        beginGameActivity();
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+
+        mJoinedGamesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    return;
+                }
+
+                // should only be in one game as the joiner
+                assert 1 == dataSnapshot.getChildrenCount();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
+                    mCurrentGameKey = snapshot.getKey();
+
+                    setAmGameCreator(false);
+
+                    if (shouldGameBegin()) {
+                        mGamesDatabaseRef.removeEventListener(this);
+                        beginGameActivity();
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -137,8 +204,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
     }
 
     private void initViews() {
-//        mUsernameTextView = (TextView) findViewById(R.id.);
-//        mWhenCreatedAccountTextView = (TextView) findViewById(R.id.created_account_time_textview);
         mOpenGameList = (ListView) findViewById(R.id.gameList);
     }
 
@@ -194,8 +259,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // TODO: if someone joins the game we need to jump to game activity
-
                         // If the user does not already have a created game, allow them to create the game.
                         if (!dataSnapshot.exists()) {
                             mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
@@ -225,6 +288,19 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // un-subscribe the listeners
+        if (mCreatedGamesListener != null) {
+            mGamesDatabaseRef.removeEventListener(mCreatedGamesListener);
+        }
+        if (mJoinedGamesListener != null) {
+            mGamesDatabaseRef.removeEventListener(mJoinedGamesListener);
+        }
+    }
+
     /**
      * Watches for the current user becoming a Joiner or Creator on a game that is about to begin
      */
@@ -235,62 +311,13 @@ public class GameRoomActivity extends FirebaseUserActivity {
         mGamesDatabaseRef.orderByChild(CREATOR_DATA_KEY.concat("/").concat(USER_ID_KEY))
                 .equalTo(uid)
                 .limitToFirst(1)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.exists()) {
-                            return;
-                        }
-                        // should only be in one game as the creator
-                        assert 1 == dataSnapshot.getChildrenCount();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
-                            mCurrentGameKey = snapshot.getKey();
-
-                            setAmGameCreator(true);
-
-                            if (shouldGameBegin()) {
-                                mGamesDatabaseRef.removeEventListener(this);
-                                beginGameActivity();
-                                break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
+                .addValueEventListener(mCreatedGamesListener);
 
         // check if user is in a game as joiner
         mGamesDatabaseRef.orderByChild(JOINER_DATA_KEY.concat("/").concat(USER_ID_KEY))
                 .equalTo(uid)
                 .limitToFirst(1)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.exists()) {
-                            return;
-                        }
-
-                        // should only be in one game as the joiner
-                        assert 1 == dataSnapshot.getChildrenCount();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
-                            mCurrentGameKey = snapshot.getKey();
-
-                            setAmGameCreator(false);
-
-                            if (shouldGameBegin()) {
-                                mGamesDatabaseRef.removeEventListener(this);
-                                beginGameActivity();
-                                break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
+                .addValueEventListener(mJoinedGamesListener);
     }
 
     /**
