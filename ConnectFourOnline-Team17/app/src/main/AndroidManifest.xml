@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".Activities.LoginActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,11 +18,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.GameActivity"
-            android:launchMode="singleTop"/>
-        <activity android:name=".Activities.WinnerActivity" />
+            android:launchMode="singleInstance"/>
+        <activity android:name=".Activities.WinnerActivity"
+            android:launchMode="singleInstance"/>
         <activity android:name=".Activities.CreateAccountActivity" />
         <activity android:name=".Activities.GameRoomActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleInstance">
         </activity>
     </application>
 

@@ -11,17 +11,20 @@ public class Constants {
      */
     // root nodes (tables)
     public static final String GAMES_DATABASE_ROOT_KEY = "games";
+    public static final String ARCHIVED_DATABASE_ROOT_KEY = "archived_games";
 
+    // user root nodes (creator or joiner) for two player game
     public static final String CREATOR_DATA_KEY = "creator";
     public static final String JOINER_DATA_KEY = "joiner";
 
     // user attribute keys
     public static final String USER_ID_KEY = "id";
     public static final String USER_DISPLAYNAME_KEY = "displayName";
+    public static final String IS_WINNER_KEY = "isWinner";
 
     // game attribute keys
     public static final String GAME_POOL_STATE_KEY = "state";
-    public static final String GAME_GAME_DUMP_KEY = "game";
+    public static final String GAME_STATE_JSON_DUMP_KEY = "game";
 
     public static final String FAKE_EMAIL_DOMAIN_URL = "@tictactoefor476appyo.com";
 
@@ -43,7 +46,7 @@ public class Constants {
     public static final String OWNERSHIP_TABLE_JSON_KEY = "com.connectfour.ownership.json.key";
     public static final String CURRENT_PLAYER_JSON_KEY = "com.connectfour.current_player.json.key";
     public static final String LAST_CHOSEN_CELL_JSON_KEY = "com.connectfour.last_chosen_cell.json.key";
-    public static final String CHOSEN_CELL_JSON_KEY = "com.connectfour.chosen_cell.json.key";
+    public static final String WINNING_PLAYER_JSON_KEY = "com.connectfour.winning_player.json.key";
 
     /**
      * Exception strings

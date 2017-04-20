@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import edu.msu.ahmedibr.connect4_team17.DatabaseModels;
 
+import static edu.msu.ahmedibr.connect4_team17.Constants.ARCHIVED_DATABASE_ROOT_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CONNECTIVITY_BROADCAST_TAG;
 import static edu.msu.ahmedibr.connect4_team17.Constants.GAMES_DATABASE_ROOT_KEY;
 
@@ -39,6 +40,7 @@ public class FirebaseUserActivity extends AppCompatActivity {
      * Firebase games database references
      */
     protected DatabaseReference mGamesDatabaseRef;
+    protected DatabaseReference mArchivedGamesDatabaseRef;
 
     private Dialog mConnectionLostDialog;
 
@@ -61,6 +63,7 @@ public class FirebaseUserActivity extends AppCompatActivity {
         // initialze the root ref
         mDatabaseRootRef = FirebaseDatabase.getInstance().getReference();
         mGamesDatabaseRef = mDatabaseRootRef.child(GAMES_DATABASE_ROOT_KEY).getRef();
+        mArchivedGamesDatabaseRef = mDatabaseRootRef.child(ARCHIVED_DATABASE_ROOT_KEY).getRef();
 
         // initialize the connection receiver and dialog
         initConnectionBroadcastReciever();

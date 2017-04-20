@@ -27,7 +27,7 @@ public class WinnerActivity extends AppCompatActivity {
         } else if (getIntent().getExtras().containsKey(WINNING_PLAYER_NAME_BUNDLE_KEY)) {
             this.setWinnerAndLoserNames();
         } else {
-            throw new RuntimeException("WinnerActivity did not recieve a valid bundle!");
+            throw new RuntimeException("WinnerActivity did not receive a valid bundle!");
         }
     }
 
@@ -60,6 +60,8 @@ public class WinnerActivity extends AppCompatActivity {
      */
     public void onNewGame(View view) {
         // by calling finish we send the user to the GameRoomActivity
+        Intent gameWaitroom = new Intent(getBaseContext(), GameRoomActivity.class);
+        startActivity(gameWaitroom);
         finish();
     }
 }

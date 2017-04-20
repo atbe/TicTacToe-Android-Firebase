@@ -20,8 +20,11 @@ public class ConnectFourGameCell {
      */
     transient private static Bitmap emptyCellImage;
 
+    transient private static Bitmap mPlayerOneDiskImage;
+
+    transient private static Bitmap mPlayerTwoDiskImage;
+
     // TODO: Making this boy static would save some memory but would need one for green and one for white
-    transient private Bitmap mDiskImage;
 
     /**
      * Row the cell is in.
@@ -83,9 +86,13 @@ public class ConnectFourGameCell {
         assert mOwningPlayer == null;
         mOwningPlayer = player;
 
-        // Load the disk image from the players id
-        // TODO: Maybe loading the bitmap once in the game class would be more resource efficient??
-        mDiskImage = BitmapFactory.decodeResource(mContext.getResources(), mOwningPlayer.getDiskImageResourceId());
+        int playerId = player.getPlayerId();
+        if (playerId == ConnectFourGame.PLAYER_ONE_ID && mPlayerOneDiskImage == null) {
+            mPlayerOneDiskImage = BitmapFactory.decodeResource(mContext.getResources(), player.getDiskImageResourceId());
+        } else if (playerId == ConnectFourGame.PLAYER_TWO_ID && mPlayerTwoDiskImage == null) {
+
+            mPlayerTwoDiskImage = BitmapFactory.decodeResource(mContext.getResources(), player.getDiskImageResourceId());
+        }
     }
 
     /**
@@ -151,7 +158,12 @@ public class ConnectFourGameCell {
 
         if (mOwningPlayer != null) {
             // Draw the bitmap
-            canvas.drawBitmap(mDiskImage, 0, 0, null);
+            canvas.drawBitmap(
+                    mOwningPlayer.getPlayerId() == ConnectFourGame.PLAYER_ONE_ID ? mPlayerOneDiskImage : mPlayerTwoDiskImage,
+                    0,
+                    0,
+                    null
+            );
         }
 
         canvas.restore();

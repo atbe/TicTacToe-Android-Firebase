@@ -1,6 +1,7 @@
 package edu.msu.ahmedibr.connect4_team17.ConnectFour;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -21,12 +22,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 import edu.msu.ahmedibr.connect4_team17.R;
 
-import static edu.msu.ahmedibr.connect4_team17.Constants.CHOSEN_CELL_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_PLAYER_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.LAST_CHOSEN_CELL_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.OWNERSHIP_TABLE_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_ONE_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.PLAYER_TWO_JSON_KEY;
+import static edu.msu.ahmedibr.connect4_team17.Constants.WINNING_PLAYER_JSON_KEY;
 
 public class ConnectFourGame {
     /**
@@ -116,6 +117,14 @@ public class ConnectFourGame {
     private ConnectFourGameCell mLastChosenCell = null;
 
     /**
+     * Uid of the winning player
+     */
+    private String mWinningPlayerUid = null;
+
+    transient public Bitmap mPlayerOneDiskImage;
+    transient public Bitmap mPlayerTwoDiskImage;
+
+    /**
      * Getter for the current players name.
      *
      * @return The String which is the current players name.
@@ -161,9 +170,9 @@ public class ConnectFourGame {
         // create the players
         // TODO: Player one always green disk?
         mPlayerOne = new ConnectFourPlayer(playerOneName, R.drawable.spartan_green_player_one,
-                PLAYER_ONE_ID, playerOneUid);
+                PLAYER_ONE_ID, playerOneUid, context);
         mPlayerTwo = new ConnectFourPlayer(playerTwoName, R.drawable.spartan_white_player_two,
-                PLAYER_TWO_ID, playerTwoUid);
+                PLAYER_TWO_ID, playerTwoUid, context);
 
         mParentActivityContext = context;
 
@@ -327,6 +336,16 @@ public class ConnectFourGame {
         }
     }
 
+    public String getWinningPlayerUid() {
+        if (mWinningPlayerUid == null) {
+            mWinningPlayerUid = checkForWin();
+            if (isThereATie()) {
+                mWinningPlayerUid = "TIE";
+            }
+        }
+        return mWinningPlayerUid;
+    }
+
     /**
      * Checks for a winner given the last move.
      *
@@ -334,11 +353,11 @@ public class ConnectFourGame {
      *
      * @return 0 if no winner, 1 or 2 otherwise indicating the player who won.
      */
-    public int checkForWin() {
+    public String checkForWin() {
         // if it is the first move
         if (mLastChosenCell == null)
         {
-            return 0;
+            return null;
         }
         int lastPlayerRow = mLastChosenCell.getRow();
         int lastPlayerColumn = mLastChosenCell.getColumn();
@@ -356,7 +375,7 @@ public class ConnectFourGame {
             }
 
             if (playerCount >= 4) {
-                return playerIdNumber;
+                return playerIdNumber == 1 ? mPlayerOne.getPlayerUid() : mPlayerTwo.getPlayerUid();
             }
         }
 
@@ -372,7 +391,7 @@ public class ConnectFourGame {
             }
 
             if (playerCount >= 4) {
-                return playerIdNumber;
+                return playerIdNumber == 1 ? mPlayerOne.getPlayerUid() : mPlayerTwo.getPlayerUid();
             }
         }
 
@@ -383,7 +402,7 @@ public class ConnectFourGame {
                         mGridColumns.get(col - 1).get(row + 1).getOwningPlayerIdNumber() == playerIdNumber &&
                         mGridColumns.get(col - 2).get(row + 2).getOwningPlayerIdNumber() == playerIdNumber &&
                         mGridColumns.get(col - 3).get(row + 3).getOwningPlayerIdNumber() == playerIdNumber) {
-                    return playerIdNumber;
+                    return playerIdNumber == 1 ? mPlayerOne.getPlayerUid() : mPlayerTwo.getPlayerUid();
                 }
             }
         }
@@ -395,13 +414,13 @@ public class ConnectFourGame {
                         mGridColumns.get(col - 1).get(row - 1).getOwningPlayerIdNumber() == playerIdNumber &&
                         mGridColumns.get(col - 2).get(row - 2).getOwningPlayerIdNumber() == playerIdNumber &&
                         mGridColumns.get(col - 3).get(row - 3).getOwningPlayerIdNumber() == playerIdNumber) {
-                    return playerIdNumber;
+                    return playerIdNumber == 1 ? mPlayerOne.getPlayerUid() : mPlayerTwo.getPlayerUid();
                 }
             }
         }
 
         // no winner
-        return 0;
+        return null;
     }
 
     // Key constants used to store the state into a bundle
@@ -498,7 +517,7 @@ public class ConnectFourGame {
      *
      * @return true for a full board resulting in a tie, and false if the board isn't full
      */
-    public boolean isThereATie(){
+    public boolean isThereATie() {
         // Loop through every tile and see if it's owned by a player or not
         for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
             // If the top of a column is not owned, the board is not full
@@ -521,7 +540,8 @@ public class ConnectFourGame {
         // and game elements
         json.add(OWNERSHIP_TABLE_JSON_KEY, gson.toJsonTree(buildOwnerShipGrid()));
         json.add(LAST_CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mLastChosenCell));
-        json.add(CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mChosenCell));
+        // save winner if there is one
+        json.add(WINNING_PLAYER_JSON_KEY, gson.toJsonTree(mWinningPlayerUid));
 
         return json.toString();
     }
@@ -534,11 +554,11 @@ public class ConnectFourGame {
         mCurrentPlayer = gson.fromJson(jsonObject.get(CURRENT_PLAYER_JSON_KEY).toString(), ConnectFourPlayer.class);
         loadOwnershipGrid( (ArrayList<ArrayList<Integer>>) gson.fromJson(
                 jsonObject.get(OWNERSHIP_TABLE_JSON_KEY).toString(), new TypeToken<ArrayList<ArrayList<Integer>>>(){}.getType()));
-        if (jsonObject.has(CHOSEN_CELL_JSON_KEY)) {
-            mChosenCell = gson.fromJson(jsonObject.get(CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
-        }
         if (jsonObject.has(LAST_CHOSEN_CELL_JSON_KEY)) {
             mLastChosenCell = gson.fromJson(jsonObject.get(LAST_CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
+        }
+        if (jsonObject.has(WINNING_PLAYER_JSON_KEY)) {
+            mWinningPlayerUid = gson.fromJson(jsonObject.get(WINNING_PLAYER_JSON_KEY).toString(), String.class);
         }
     }
 
@@ -547,5 +567,10 @@ public class ConnectFourGame {
             return mCurrentPlayer.getPlayerUid();
         }
         return null;
+    }
+
+    public void userSurrenders(String uid) {
+        mWinningPlayerUid = uid.equals(mPlayerOne.getPlayerUid()) ? mPlayerTwo.getPlayerUid() :
+                mPlayerOne.getPlayerUid();
     }
 }
