@@ -133,7 +133,8 @@ public class GameActivity extends FirebaseUserActivity {
 
                         // in-progress game, let's make sure the game has not ended
                         if (mConnectFourView.isGameWon() &&
-                                !(dataSnapshot.child(JOINER_DATA_KEY).child(IS_WINNER_KEY).exists() && dataSnapshot.child(CREATOR_DATA_KEY).child(IS_WINNER_KEY).exists())) {
+                                !(dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class).equals(
+                                        DatabaseModels.Game.State.ENDED.ordinal()))) {
                             sendFirebaseWinningState();
                             mGamesDatabaseRef.removeEventListener(this);
                         }
@@ -331,13 +332,14 @@ public class GameActivity extends FirebaseUserActivity {
      * to archive the game.
      */
     private void handleGameEnd() {
+        Log.e("HandleGameEnd", "Game is ending now!");
         final String otherPlayerPosition = mAmCreator ? JOINER_DATA_KEY : CREATOR_DATA_KEY;
         mGamesDatabaseRef.child(mCurrentGameKey)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(final DataSnapshot dataSnapshotGamesDb) {
                         // if the other player has not seen the game result, do not mark game as ended
-                        if (!dataSnapshotGamesDb.child(otherPlayerPosition).child(IS_WINNER_KEY).exists()) {
+                        if (!dataSnapshotGamesDb.exists()) {
                             mGamesDatabaseRef.removeEventListener(this);
                             return;
                         }
@@ -424,9 +426,11 @@ public class GameActivity extends FirebaseUserActivity {
 
         if (mConnectFourView.isGameWon()) {
             sendFirebaseWinningState();
+            return;
         }
         else if (mConnectFourView.isThereATie()) {
             sendFirebaseWinningState();
+            return;
         }
 
         // write out the new game state to the server in a transaction
