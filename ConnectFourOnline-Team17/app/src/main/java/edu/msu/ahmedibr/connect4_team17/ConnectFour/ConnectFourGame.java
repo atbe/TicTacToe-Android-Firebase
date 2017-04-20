@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import edu.msu.ahmedibr.connect4_team17.Activities.GameActivity;
 import edu.msu.ahmedibr.connect4_team17.R;
 
-import static edu.msu.ahmedibr.connect4_team17.Constants.CHOSEN_CELL_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.CURRENT_PLAYER_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.LAST_CHOSEN_CELL_JSON_KEY;
 import static edu.msu.ahmedibr.connect4_team17.Constants.OWNERSHIP_TABLE_JSON_KEY;
@@ -541,7 +540,6 @@ public class ConnectFourGame {
         // and game elements
         json.add(OWNERSHIP_TABLE_JSON_KEY, gson.toJsonTree(buildOwnerShipGrid()));
         json.add(LAST_CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mLastChosenCell));
-        json.add(CHOSEN_CELL_JSON_KEY, gson.toJsonTree(mChosenCell));
         // save winner if there is one
         json.add(WINNING_PLAYER_JSON_KEY, gson.toJsonTree(mWinningPlayerUid));
 
@@ -556,9 +554,6 @@ public class ConnectFourGame {
         mCurrentPlayer = gson.fromJson(jsonObject.get(CURRENT_PLAYER_JSON_KEY).toString(), ConnectFourPlayer.class);
         loadOwnershipGrid( (ArrayList<ArrayList<Integer>>) gson.fromJson(
                 jsonObject.get(OWNERSHIP_TABLE_JSON_KEY).toString(), new TypeToken<ArrayList<ArrayList<Integer>>>(){}.getType()));
-        if (jsonObject.has(CHOSEN_CELL_JSON_KEY)) {
-            mChosenCell = gson.fromJson(jsonObject.get(CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
-        }
         if (jsonObject.has(LAST_CHOSEN_CELL_JSON_KEY)) {
             mLastChosenCell = gson.fromJson(jsonObject.get(LAST_CHOSEN_CELL_JSON_KEY).toString(), ConnectFourGameCell.class);
         }

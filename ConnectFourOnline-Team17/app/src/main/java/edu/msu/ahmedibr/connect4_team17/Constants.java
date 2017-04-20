@@ -46,7 +46,6 @@ public class Constants {
     public static final String OWNERSHIP_TABLE_JSON_KEY = "com.connectfour.ownership.json.key";
     public static final String CURRENT_PLAYER_JSON_KEY = "com.connectfour.current_player.json.key";
     public static final String LAST_CHOSEN_CELL_JSON_KEY = "com.connectfour.last_chosen_cell.json.key";
-    public static final String CHOSEN_CELL_JSON_KEY = "com.connectfour.chosen_cell.json.key";
     public static final String WINNING_PLAYER_JSON_KEY = "com.connectfour.winning_player.json.key";
 
     /**
