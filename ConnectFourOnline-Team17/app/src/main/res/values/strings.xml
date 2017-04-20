@@ -2,7 +2,7 @@
     <!--Prompts-->
     <string name="player_one_name_prompt">Player 1 Name</string>
     <string name="player_two_name_prompt">Player 2 Name</string>
-    <string name="new_game">New Game</string>
+    <string name="new_game">Find another Game</string>
     <string name="instructions">Instructions</string>
     <string name="loser_text">Sorry, you lost.</string>
     <string name="tied">Tie Game!</string>
