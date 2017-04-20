@@ -13,7 +13,7 @@
         android:layout_height="match_parent">
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/createGaemRoomActionButton"
+        android:id="@+id/createGameRoomActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content" />
 
         <TextView android:id="@+id/clickToJoinGameHint"
-            android:text="Tab on a game to join."
+            android:text="@string/game_room_subheader"
             android:paddingTop="5dp"
             android:textSize="15sp"
             android:layout_centerHorizontal="true"
