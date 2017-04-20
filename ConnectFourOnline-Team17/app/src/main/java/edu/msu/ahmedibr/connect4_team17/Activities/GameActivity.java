@@ -61,6 +61,22 @@ public class GameActivity extends FirebaseUserActivity {
 
     private boolean mAmCreator;
 
+    ValueEventListener mGameStateListener;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGamesDatabaseRef.addValueEventListener(mGameStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGameStateListener != null) {
+            mGamesDatabaseRef.removeEventListener(mGameStateListener);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,55 +110,57 @@ public class GameActivity extends FirebaseUserActivity {
         mConnectFourView.beginGame((TextView)findViewById(R.id.current_player_name_textview),
                 mAuth.getCurrentUser().getUid());
 
-        // setup the data listener and send the initial game state if needed
-        mGamesDatabaseRef.child(mCurrentGameKey)
-                .addValueEventListener(new ValueEventListener() {
+        // initialize the game state listener
+        mGameStateListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    return;
+                }
 
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.exists()) {
-                            return;
-                        }
-
-                        // TODO: Other player made a change to game state,
-                        // load it
+                // TODO: Other player made a change to game state,
+                // load it
 //                        Log.d("GameStateChange", "The game state has changed.");
 //                        makeSnack("SHOULD REFRESH GAME", Snackbar.LENGTH_LONG);
 
-                        // this can be null if the game activity is still listening for events but
-                        // the game ended (activity still being killed)
-                        Integer gameState = dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class);
-                        if (gameState == null) {
-                            return;
-                        }
+                // this can be null if the game activity is still listening for events but
+                // the game ended (activity still being killed)
+                Integer gameState = dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class);
+                if (gameState == null) {
+                    return;
+                }
 
-                        // this is the case in which the current player is the creator and the game is
-                        // yet to be created
-                        if (gameState == DatabaseModels.Game.State.JOINED.ordinal()
-                                && mAmCreator) {
-                            // will run in transaction
-                            initializeFirebaseGame();
+                // this is the case in which the current player is the creator and the game is
+                // yet to be created
+                if (gameState == DatabaseModels.Game.State.JOINED.ordinal()
+                        && mAmCreator) {
+                    // will run in transaction
+                    initializeFirebaseGame();
 //                            Log.d("GameStateChange", "Initializing game");
-                        } else {
-                            String jsonData = dataSnapshot.child(GAME_STATE_JSON_DUMP_KEY).getValue(String.class);
-                            if (jsonData != null) {
-                                loadGameFromJson(jsonData);
-                            }
-                            mConnectFourView.invalidate();
-                        }
-
-                        // in-progress game, let's make sure the game has not ended
-                        if (mConnectFourView.isGameWon() &&
-                                !(dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class).equals(
-                                        DatabaseModels.Game.State.ENDED.ordinal()))) {
-                            sendFirebaseWinningState();
-                            mGamesDatabaseRef.removeEventListener(this);
-                        }
+                } else {
+                    String jsonData = dataSnapshot.child(GAME_STATE_JSON_DUMP_KEY).getValue(String.class);
+                    if (jsonData != null) {
+                        loadGameFromJson(jsonData);
                     }
+                    mConnectFourView.invalidate();
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
+                // in-progress game, let's make sure the game has not ended
+                if (mConnectFourView.isGameWon() &&
+                        !(dataSnapshot.child(GAME_POOL_STATE_KEY).getValue(Integer.class).equals(
+                                DatabaseModels.Game.State.ENDED.ordinal()))) {
+                    sendFirebaseWinningState();
+                    mGamesDatabaseRef.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+
+        // setup the data listener and send the initial game state if needed
+        mGamesDatabaseRef.child(mCurrentGameKey)
+                .addValueEventListener(mGameStateListener);
 
         /*
          * Restore any state
@@ -297,6 +315,11 @@ public class GameActivity extends FirebaseUserActivity {
                     return;
                 }
 
+                // no need to update and see the game result if we already have.
+                if (dataSnapshot.child(position).child(IS_WINNER_KEY).exists()) {
+                    return;
+                }
+
                 mGamesDatabaseRef.child(mCurrentGameKey)
                 .runTransaction(new Transaction.Handler() {
                     @Override
@@ -392,7 +415,6 @@ public class GameActivity extends FirebaseUserActivity {
                 // if the other player has not seen the game result, do not mark game as ended
                 if (!dataSnapshot.child(otherPlayerPosition).child(IS_WINNER_KEY).exists() ||
                         !dataSnapshot.exists()) {
-                    Log.d("HandleArchive", "SHOULD NOT RUN");
                     mGamesDatabaseRef.removeEventListener(this);
                     return;
                 }

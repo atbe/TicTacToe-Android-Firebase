@@ -64,8 +64,14 @@ public class GameRoomActivity extends FirebaseUserActivity {
         super.onStart();
 
         // re-subscribe the listeners
-        mGamesDatabaseRef.addValueEventListener(mCreatedGamesListener);
-        mGamesDatabaseRef.addValueEventListener(mJoinedGamesListener);
+        mGamesDatabaseRef.orderByChild(CREATOR_DATA_KEY.concat("/").concat(USER_ID_KEY))
+                .equalTo(mAuth.getCurrentUser().getUid())
+                .limitToFirst(1)
+                .addValueEventListener(mCreatedGamesListener);
+        mGamesDatabaseRef.orderByChild(JOINER_DATA_KEY.concat("/").concat(USER_ID_KEY))
+                .equalTo(mAuth.getCurrentUser().getUid())
+                .limitToFirst(1)
+                .addValueEventListener(mJoinedGamesListener);
     }
 
     @Override
@@ -80,17 +86,11 @@ public class GameRoomActivity extends FirebaseUserActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    // User is signed in
 //                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-
-                    // poll to get a current game
                     monitorMyGameState();
 
                 } else {
-
-                    // User is signed out
 //                    Log.d(LOGIN_STATUS_CHANGED_TAG, "onAuthStateChanged:signed_out");
-
                     // close the game room
                     finish();
                 }
@@ -326,6 +326,15 @@ public class GameRoomActivity extends FirebaseUserActivity {
      */
     private boolean shouldGameBegin() {
         if (mCurrentGame == null) {
+            return false;
+        }
+
+        // we should not start the game again if we already saw the result
+        DatabaseModels.User me = mAmGameCreator ? mCurrentGame.getCreator() : mCurrentGame.getJoiner();
+        if (me == null) {
+            return false;
+        }
+        if (me.getIsWinner() != null) {
             return false;
         }
 
