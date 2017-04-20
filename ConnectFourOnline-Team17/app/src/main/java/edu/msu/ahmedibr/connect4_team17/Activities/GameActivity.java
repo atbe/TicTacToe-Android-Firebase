@@ -132,7 +132,8 @@ public class GameActivity extends FirebaseUserActivity {
                         }
 
                         // in-progress game, let's make sure the game has not ended
-                        if (mConnectFourView.isGameWon()) {
+                        if (mConnectFourView.isGameWon() &&
+                                !(dataSnapshot.child(JOINER_DATA_KEY).child(IS_WINNER_KEY).exists() && dataSnapshot.child(CREATOR_DATA_KEY).child(IS_WINNER_KEY).exists())) {
                             sendFirebaseWinningState();
                             mGamesDatabaseRef.removeEventListener(this);
                         }
@@ -297,6 +298,7 @@ public class GameActivity extends FirebaseUserActivity {
                         mutableData.child(GAME_STATE_JSON_DUMP_KEY)
                                 .setValue(gameToJsonString());
 
+                        handleGameEnd();
                         return Transaction.success(mutableData);
                     }
 
@@ -309,7 +311,6 @@ public class GameActivity extends FirebaseUserActivity {
                         }
                         // try to update the game state
                         handleGameEndActivity();
-                        handleGameEnd();
                         finish();
                     }
                 });
@@ -375,6 +376,7 @@ public class GameActivity extends FirebaseUserActivity {
                 // if the other player has not seen the game result, do not mark game as ended
                 if (!dataSnapshot.child(otherPlayerPosition).child(IS_WINNER_KEY).exists() ||
                         !dataSnapshot.exists()) {
+                    Log.d("HandleArchive", "SHOULD NOT RUN");
                     mGamesDatabaseRef.removeEventListener(this);
                     return;
                 }
