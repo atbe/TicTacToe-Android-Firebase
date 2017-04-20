@@ -153,7 +153,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             return;
         }
 
-        // user no real email authntication for this project, and firebase requires *some* email
+        // user no real email authentication for this project, and firebase requires *some* email
         mAuth.createUserWithEmailAndPassword(username + FAKE_EMAIL_DOMAIN_URL, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override

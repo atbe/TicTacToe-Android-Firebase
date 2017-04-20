@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="Open Games"
+            android:text="@string/open_game"
             android:textSize="30sp" />
 
         <TextView

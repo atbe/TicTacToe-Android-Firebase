@@ -27,7 +27,7 @@
         app:srcCompat="@drawable/ic_add_black_36dp"/>
 
     <TextView android:id="@+id/openGamesTitle"
-        android:text="Open Games"
+        android:text="@string/open_game"
         android:textSize="30sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"

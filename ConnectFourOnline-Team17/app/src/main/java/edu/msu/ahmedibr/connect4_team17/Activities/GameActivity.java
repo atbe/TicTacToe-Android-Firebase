@@ -507,9 +507,9 @@ public class GameActivity extends FirebaseUserActivity {
         Intent intent = new Intent(this, WinnerActivity.class);
 
         mWinnerName = getIntent().getStringExtra(PLAYER_ONE_UID_BUNDLE_KEY).equals(mConnectFourView.getWinningPlayerUid()) ?
-            getIntent().getStringExtra(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY) : getIntent().getStringExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY);;
+            getIntent().getStringExtra(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY) : getIntent().getStringExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY);
         mLoserName = getIntent().getStringExtra(PLAYER_ONE_UID_BUNDLE_KEY).equals(mConnectFourView.getWinningPlayerUid()) ?
-                getIntent().getStringExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY) : getIntent().getStringExtra(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY);;
+                getIntent().getStringExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY) : getIntent().getStringExtra(PLAYER_ONE_DISPLAYNAME_BUNDLE_KEY);
         intent.putExtra(WinnerActivity.WINNING_PLAYER_NAME_BUNDLE_KEY, mWinnerName);
         intent.putExtra(WinnerActivity.LOSING_PLAYER_NAME_BUNDLE_KEY, mLoserName);
 
