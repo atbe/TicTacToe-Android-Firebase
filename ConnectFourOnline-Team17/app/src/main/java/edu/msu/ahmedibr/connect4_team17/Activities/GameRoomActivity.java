@@ -154,6 +154,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 assert 1 == dataSnapshot.getChildrenCount();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
+                    if (mCurrentGame == null || mCurrentGame.getState() == DatabaseModels.Game.State.ENDED.ordinal()) {
+                        return;
+                    }
                     mCurrentGameKey = snapshot.getKey();
 
                     setAmGameCreator(true);
@@ -181,6 +184,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 assert 1 == dataSnapshot.getChildrenCount();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     mCurrentGame = snapshot.getValue(DatabaseModels.Game.class);
+                    if (mCurrentGame == null || mCurrentGame.getState() == DatabaseModels.Game.State.ENDED.ordinal()) {
+                        return;
+                    }
                     mCurrentGameKey = snapshot.getKey();
 
                     setAmGameCreator(false);
@@ -242,22 +248,18 @@ public class GameRoomActivity extends FirebaseUserActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // If the user does not already have a created game, allow them to create the game.
-                        if (!dataSnapshot.exists()) {
+                        // try to load up the game, if it was pushed
+                        if (mCurrentGame == null) {
+                            mCurrentGame = dataSnapshot.getValue(DatabaseModels.Game.class);
+                        }
+
+                        // If the game doesn't exist or the game exists but has ended, allow the player to create another game.
+                        if (mCurrentGame == null || (mCurrentGame.getState() == DatabaseModels.Game.State.ENDED.ordinal())) {
                             mGamesDatabaseRef.runTransaction(new Transaction.Handler() {
                                 @Override
                                 public Transaction.Result doTransaction(MutableData mutableData) {
                                     // safety against callbacks while activity is shutting down
-                                    if (mCurrentGame == null) {
-                                        mGamesDatabaseRef.push().setValue(game);
-                                    } else {
-                                        // if the current user already joined a game and is waiting for the creator
-                                        if (mCurrentGame.getCreator() != null) {
-                                            makeSnack(String.format(ALREADY_JOINED_CANT_CREATE_GAME,
-                                                    mCurrentGame.getCreator().getDisplayName()), Snackbar.LENGTH_INDEFINITE);
-                                        }
-                                        return Transaction.abort();
-                                    }
+                                    mGamesDatabaseRef.push().setValue(game);
                                     return Transaction.success(mutableData);
                                 }
 
@@ -267,7 +269,17 @@ public class GameRoomActivity extends FirebaseUserActivity {
                                 }
                             });
                         } else {
-                            makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
+                            // has someone joined this game?
+                            if (mCurrentGame.getJoiner() != null) {
+                                // if we are the ones who joined
+                                if (mCurrentGame.getJoiner().getId().equals(uid)) {
+                                    makeSnack(String.format(ALREADY_JOINED_CANT_CREATE_GAME,
+                                            mCurrentGame.getCreator().getDisplayName()), Snackbar.LENGTH_INDEFINITE);
+                                }
+                            } else {
+                                // we are the creator waiting for someone to join
+                                makeSnack(R.string.already_created_game, Snackbar.LENGTH_LONG);
+                            }
                         }
                     }
 
@@ -377,7 +389,6 @@ public class GameRoomActivity extends FirebaseUserActivity {
             @Override
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 mCurrentGame = dataSnapshot.child(gameId).getValue(DatabaseModels.Game.class);
-                monitorMyGameState();
                 shouldGameBegin();
             }
         });
@@ -396,6 +407,9 @@ public class GameRoomActivity extends FirebaseUserActivity {
         launchGame.putExtra(PLAYER_ONE_UID_BUNDLE_KEY, mCurrentGame.getCreator().getId());
         launchGame.putExtra(PLAYER_TWO_DISPLAYNAME_BUNDLE_KEY, mCurrentGame.getJoiner().getDisplayName());
         launchGame.putExtra(PLAYER_TWO_UID_BUNDLE_KEY, mCurrentGame.getJoiner().getId());
+
+        // remove the game
+        mCurrentGame = null;
 
         startActivity(launchGame);
 
