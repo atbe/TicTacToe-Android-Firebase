@@ -229,8 +229,8 @@ public class GameActivity extends FirebaseUserActivity {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Quit Game")
-                .setMessage("Are you sure you want to quit the current game? All progress will be lost.")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                .setMessage("You're currently in the middle of the game. What would you like to do? Press back to cancel.")
+                .setPositiveButton("Surrender", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -240,7 +240,12 @@ public class GameActivity extends FirebaseUserActivity {
                         finish();
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
                 .show();
     }
 
